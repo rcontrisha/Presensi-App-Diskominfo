@@ -15,6 +15,7 @@ class HomePage extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.blue[700],
         foregroundColor: Colors.white,
+        automaticallyImplyLeading: false,
       ),
       body: Obx(() => _controller.isLoading
           ? Center(child: CircularProgressIndicator())
@@ -51,16 +52,16 @@ class HomePage extends StatelessWidget {
                             SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: () {
-                                if (_controller.currentPosition != null) {
-                                  Get.to(() => PresencePage());
-                                } else {
-                                  print(
-                                      'Current position is null. Unable to navigate.');
-                                }
+                                Get.to(() => PresencePage());
                               },
                               child: Text('Go To Presence Page'),
                             ),
                             Text('Device ID: ${_controller.deviceId}'),
+                            SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: _controller.logout,
+                              child: Text('Log Out'),
+                            ),
                           ],
                         ),
                       ),

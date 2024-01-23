@@ -2,12 +2,15 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:get/get.dart';
+import 'package:maps/Modules/Login%20Page/View/login_view.dart';
 import 'package:maps/Services/PresenceAPI.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:device_info/device_info.dart';
+
+final SharedPreferences _sharedPreferences = Get.find<SharedPreferences>();
 
 class CompanyData {
   static Map<String, dynamic> office = {
@@ -28,9 +31,6 @@ class HomeController extends GetxController {
   bool get isLoading => _isLoading.value;
 
   RxString get deviceId => _deviceId;
-
-  // Reference to the shared preferences
-  final _sharedPreferences = Get.find<SharedPreferences>();
 
   @override
   void onInit() {
@@ -176,5 +176,11 @@ class HomeController extends GetxController {
     } catch (e) {
       print('Error launching maps: $e');
     }
+  }
+
+  void logout() {
+    _sharedPreferences.remove('hasLoggedIn');
+    _sharedPreferences.remove('nip');
+    Get.to(() => LoginScreen());
   }
 }

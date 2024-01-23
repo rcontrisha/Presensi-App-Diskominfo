@@ -23,6 +23,34 @@ class UserController extends GetxController {
     return prefs.getString('nip');
   }
 
+  // Method to check if the user has previously logged in
+  bool hasLoggedInBefore() {
+    return prefs.getBool('hasLoggedIn') ?? false;
+  }
+
+  // Method to set the flag indicating that the user has logged in
+  Future<void> setLoggedInFlag() async {
+    await prefs.setBool('hasLoggedIn', true);
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    checkLoginStatus();
+  }
+
+  void checkLoginStatus() {
+    // Check if the user has previously logged in
+    if (hasLoggedInBefore()) {
+      isLoggedIn.value = true;
+
+      // Schedule navigation to the home page after the current frame has been painted
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
+        Get.offNamed('/home');
+      });
+    }
+  }
+
   void loginUser() async {
     try {
       isLoading.value = true; // Show loading indicator
@@ -35,10 +63,12 @@ class UserController extends GetxController {
             user['password'] == passwordController.text) {
           // Set the isLoggedIn flag to true if credentials are valid
           isLoggedIn.value = true;
-          print('Login successful');
 
           // Save NIP to shared preferences
           await saveNIP(user['nip']);
+
+          // Set the flag indicating that the user has logged in
+          await setLoggedInFlag();
 
           // Show success snackbar
           Get.snackbar('Success', 'Login successful',
@@ -62,9 +92,5 @@ class UserController extends GetxController {
     } finally {
       isLoading.value = false; // Hide loading indicator
     }
-  }
-
-  void logout() {
-    isLoggedIn.value = false;
   }
 }

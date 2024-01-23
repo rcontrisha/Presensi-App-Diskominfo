@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PresenceService {
-  static const String baseUrl = "http://192.168.204.163/presenceAPI";
+  static const String baseUrl = "http://10.10.111.116/presenceAPI";
 
   Future<List<Map<String, dynamic>>> fetchData() async {
     final response = await http.get(Uri.parse('$baseUrl/view.php'));
