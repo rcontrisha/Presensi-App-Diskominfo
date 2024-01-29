@@ -26,6 +26,21 @@ class LoginScreen extends StatelessWidget {
               obscureText: true,
             ),
             SizedBox(height: 16.0),
+            Row(
+              children: [
+                Obx(
+                  () => Checkbox(
+                    value: userController.rememberMe.value,
+                    onChanged: (value) {
+                      userController.rememberMe.value =
+                          !userController.rememberMe.value;
+                    },
+                  ),
+                ),
+                Text('Remember me'),
+              ],
+            ),
+            SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: userController.loginUser,
               child: Text('Login'),

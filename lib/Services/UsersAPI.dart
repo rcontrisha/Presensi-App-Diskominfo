@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class UserService {
   static const String apiUrl =
-      'https://a051fcc9-d6e0-43af-96ab-04f0929a58da.mock.pstmn.io/get';
+      'https://771546f4-d1b7-45f7-9454-46251d44ff65.mock.pstmn.io/get';
 
   static Future<List<dynamic>> getUsers() async {
     final response = await http.get(Uri.parse(apiUrl));

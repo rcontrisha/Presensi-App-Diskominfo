@@ -50,8 +50,8 @@ class PresencePage extends StatelessWidget {
                       );
                     } else {
                       final addressDetails = snapshot.data!;
-                      String formattedTime = DateFormat('HH:mm:ss')
-                          .format(DateTime.parse(presence['waktu']));
+                      String formattedDate = DateFormat('EEEE, MMM d, y')
+                          .format(DateTime.parse(presence['tanggal']));
                       return ListTile(
                         title: Text('NIP: ${presence['nip']}'),
                         subtitle: Column(
@@ -61,7 +61,11 @@ class PresencePage extends StatelessWidget {
                                 'Location: ${addressDetails.street}, ${addressDetails.district}, ${addressDetails.kecamatan}, ${addressDetails.city}, ${addressDetails.province}'),
                             Text('Latitude: ${presence['latitude']}'),
                             Text('Longitude: ${presence['longitude']}'),
-                            Text('Time: $formattedTime'),
+                            Text('Date: ${presence['tanggal']}'),
+                            Text(
+                                'Check In: ${presence['check_in'] as String? ?? 'N/A'}'),
+                            Text(
+                                'Check Out: ${presence['check_out'] as String? ?? 'N/A'}'),
                             Text('Device ID: ${presence['device_id']}'),
                           ],
                         ),

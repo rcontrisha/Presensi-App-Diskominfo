@@ -1,7 +1,7 @@
 // home_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:maps/Modules/Presence History/View/presence_view.dart';
+import '../../Presence History/View/presence_view.dart';
 import '../Controller/home_controller.dart';
 
 class HomePage extends StatelessWidget {
@@ -24,10 +24,7 @@ class HomePage extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    Center(
-                      child: Text('Cukurukuk'),
-                    ),
-                    if (_controller.currentPosition != null) // Null check
+                    if (_controller.currentPosition != null)
                       Center(
                         child: Column(
                           children: [
@@ -52,11 +49,11 @@ class HomePage extends StatelessWidget {
                             SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: () {
+                                // Navigate to the Presence History page
                                 Get.to(() => PresencePage());
                               },
-                              child: Text('Go To Presence Page'),
+                              child: Text('Presence History'),
                             ),
-                            Text('Device ID: ${_controller.deviceId}'),
                             SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: _controller.logout,

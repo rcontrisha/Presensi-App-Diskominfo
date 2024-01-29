@@ -1,7 +1,7 @@
 // home_controller.dart
 import 'dart:io';
-import 'dart:math';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:maps/Modules/Login%20Page/View/login_view.dart';
 import 'package:maps/Services/PresenceAPI.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -21,16 +21,30 @@ class CompanyData {
 
 class HomeController extends GetxController {
   final Rx<Position?> _currentPosition = Rx<Position?>(null);
+  RxList<Map<String, dynamic>> presenceData = <Map<String, dynamic>>[].obs;
+  RxBool loadingAPI = true.obs;
   final RxBool _isLoading = true.obs;
-  late RxString _deviceId = ''.obs;
+  final RxBool _isCheckInButtonVisible = false.obs;
+  final RxBool _isCheckOutButtonVisible = false.obs;
+  final RxBool _areButtonsDisabled = false.obs;
+  late AndroidDeviceInfo _androidInfo;
+  late String _androidId = '';
+  late bool loggedToday = false;
 
-  // Public getter for _currentPosition
+  bool _deviceInfoLoaded = false;
+
   Position? get currentPosition => _currentPosition.value;
-
-  // Public getter for _isLoading
   bool get isLoading => _isLoading.value;
+  bool get isCheckInButtonVisible => _isCheckInButtonVisible.value;
+  bool get isCheckOutButtonVisible => _isCheckOutButtonVisible.value;
+  bool get areButtonsDisabled => _areButtonsDisabled.value;
 
-  RxString get deviceId => _deviceId;
+  String get androidId {
+    if (!_deviceInfoLoaded) {
+      return 'Loading device information...';
+    }
+    return _androidId;
+  }
 
   @override
   void onInit() {
@@ -38,14 +52,125 @@ class HomeController extends GetxController {
     requestPermission();
   }
 
+  Future<void> fetchData() async {
+    final storedNIP = _sharedPreferences.getString('nip');
+    try {
+      print("Fetching data...");
+      loadingAPI(true);
+      List<Map<String, dynamic>> data =
+          await PresenceService().getPresenceByUser(storedNIP);
+      presenceData.assignAll(data);
+    } catch (e) {
+      print('Error: $e');
+      // Handle error as needed
+    } finally {
+      loadingAPI(false);
+      print("Data fetching completed.");
+    }
+  }
+
+  Future<void> checkCheckInCheckOutStatus() async {
+    final storedNIP = _sharedPreferences.getString('nip');
+
+    if (storedNIP != null) {
+      try {
+        // Get today's date
+        final today = DateTime.now();
+        final todayFormatted = DateFormat('yyyy-MM-dd').format(today);
+        print('Today Formatted: $todayFormatted');
+
+        // Set loggedToday to false initially
+        loggedToday = false;
+        print('Presence Data: $presenceData');
+
+        for (int i = 0; i < presenceData.length; i++) {
+          print(
+              'Server Tanggal: ${presenceData[i]['tanggal']}, Today Formatted: $todayFormatted');
+          if (presenceData[i]['tanggal'] == todayFormatted) {
+            loggedToday = true;
+            break;
+          }
+        }
+
+        print(loggedToday);
+      } catch (e) {
+        print('Error fetching presence data: $e');
+      }
+    }
+  }
+
+  void _showCheckInButton() {
+    // Update the state in your controller to show the Check In button
+    // For example, set a boolean flag like isCheckInButtonVisible to true
+    // and use it in your view to conditionally show the Check In button.
+    _isCheckInButtonVisible.value = true;
+    _isCheckOutButtonVisible.value =
+        false; // Make sure Check Out button is hidden
+  }
+
+  void _showCheckOutButton() {
+    // Update the state in your controller to show the Check Out button
+    // For example, set a boolean flag like isCheckOutButtonVisible to true
+    // and use it in your view to conditionally show the Check Out button.
+    _isCheckOutButtonVisible.value = true;
+    _isCheckInButtonVisible.value =
+        false; // Make sure Check In button is hidden
+  }
+
+  void _showBothButtonsDisabled() {
+    // Update the state in your controller to handle the case
+    // where both Check In and Check Out buttons are disabled.
+    // For example, set a boolean flag like areButtonsDisabled to true
+    // and use it in your view to conditionally disable both buttons.
+    _areButtonsDisabled.value = true;
+    _isCheckInButtonVisible.value = false;
+    _isCheckOutButtonVisible.value = false;
+  }
+
   Future<void> requestPermission() async {
     final PermissionStatus status = await Permission.location.request();
     if (status.isGranted) {
-      _getCurrentLocation();
+      await _getCurrentLocation();
+      await _getDeviceId(); // Ensure _getDeviceId is called after obtaining location
+      await fetchData();
+      await checkCheckInCheckOutStatus();
     } else {
       print('Location permission denied');
       _isLoading.value = false;
     }
+  }
+
+  Future<void> _getDeviceId() async {
+    try {
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        print('Android ID: ${androidInfo.androidId}');
+        _androidId = androidInfo.androidId;
+
+        // Set the flag to indicate that device information has been loaded
+        _deviceInfoLoaded = true;
+      } else {
+        throw Exception('Unsupported platform');
+      }
+    } catch (e) {
+      print('Error getting device information: $e');
+      rethrow;
+    }
+  }
+
+  Future<bool> checkGpsStatus() async {
+    bool isGpsEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!isGpsEnabled) {
+      // If GPS is not enabled, show a snackbar or alert to prompt the user to enable it
+      Get.snackbar(
+        'GPS is Disabled',
+        'Please enable GPS to use this feature.',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: Duration(seconds: 3),
+      );
+    }
+    return isGpsEnabled;
   }
 
   Future<void> _getCurrentLocation() async {
@@ -54,33 +179,11 @@ class HomeController extends GetxController {
           desiredAccuracy: LocationAccuracy.high);
       _currentPosition.value = position;
 
-      // Get the device ID
-      String deviceId = await _getDeviceId();
-      _deviceId.value = deviceId; // Set the device ID
-
       _isLoading.value = false;
     } catch (e, stackTrace) {
       print('Error getting current location: $e');
       print('Stack trace: $stackTrace');
       _isLoading.value = false;
-    }
-  }
-
-  Future<String> _getDeviceId() async {
-    try {
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      if (Platform.isAndroid) {
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        return androidInfo.androidId; // Android ID
-      } else if (Platform.isIOS) {
-        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-        return iosInfo.identifierForVendor; // iOS ID
-      } else {
-        return 'unknown';
-      }
-    } catch (e) {
-      print('Error getting device ID: $e');
-      return 'unknown';
     }
   }
 
@@ -105,15 +208,19 @@ class HomeController extends GetxController {
   Future<void> postPresensi() async {
     final storedNIP = _sharedPreferences.getString('nip');
     final currentPosition = _currentPosition.value;
+    print('Stored NIP: $storedNIP');
+    print('Current Position: $currentPosition');
+    print('Android ID: $_androidId');
 
-    if (storedNIP != null && currentPosition != null) {
+    if (storedNIP != null && currentPosition != null && _deviceInfoLoaded) {
       try {
         Map<String, dynamic> presensiData = {
           'nip': storedNIP,
           'latitude': currentPosition.latitude,
           'longitude': currentPosition.longitude,
-          'waktu': DateTime.now(),
-          'device_id': _deviceId.value,
+          'tanggal': DateTime.now(),
+          'device_id': _androidId,
+          'status': 'masuk'
         };
 
         // Customize the API call according to your needs
@@ -123,33 +230,34 @@ class HomeController extends GetxController {
         print('Error posting presensi: $e');
       }
     } else {
-      print('Stored NIP or current position is null. Unable to post presensi.');
+      print(
+          'Stored NIP, current position, or device info is null. Unable to post presensi.');
     }
   }
 
   void handlePresensi() async {
+    // Check GPS status before processing the presence button click
+    bool isGpsEnabled = await checkGpsStatus();
+    if (!isGpsEnabled) {
+      return;
+    }
+
     final currentPosition = _currentPosition.value;
-    final storedNIP = _sharedPreferences.getString('StoredNIP');
+    final storedNIP = _sharedPreferences.getString('nip');
 
     if (currentPosition != null) {
       double distance = calculateDistance(currentPosition, CompanyData.office);
       showPresensiSnackbar(distance);
-      // Call postPresensi here if you want to automatically post after checking distance
     } else {
       print('Unable to calculate distance. Location not available.');
     }
-  }
-
-  int _generateRandomNumber() {
-    // Generate a random 6-digit number
-    return Random().nextInt(900000) + 100000;
   }
 
   void showPresensiSnackbar(double distance) {
     String presensiMessage;
 
     if (distance != null) {
-      if (distance < 300) {
+      if (distance < 1000) {
         presensiMessage = 'Presensi Sukses!';
         postPresensi();
       } else {

@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:maps/Services/UsersAPI.dart';
+import 'package:device_info/device_info.dart';
 
 class UserController extends GetxController {
   final emailController = TextEditingController();
@@ -9,29 +12,13 @@ class UserController extends GetxController {
 
   final RxBool isLoggedIn = false.obs;
   final RxBool isLoading = false.obs;
+  final RxBool rememberMe = false.obs;
+
+  late AndroidDeviceInfo _androidInfo;
+  late String _androidId;
 
   // Add shared preferences instance
-  final SharedPreferences prefs = Get.find<SharedPreferences>();
-
-  // Method to save NIP to shared preferences
-  Future<void> saveNIP(String nip) async {
-    await prefs.setString('nip', nip);
-  }
-
-  // Method to get NIP from shared preferences
-  String? getStoredNIP() {
-    return prefs.getString('nip');
-  }
-
-  // Method to check if the user has previously logged in
-  bool hasLoggedInBefore() {
-    return prefs.getBool('hasLoggedIn') ?? false;
-  }
-
-  // Method to set the flag indicating that the user has logged in
-  Future<void> setLoggedInFlag() async {
-    await prefs.setBool('hasLoggedIn', true);
-  }
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   @override
   void onInit() {
@@ -39,9 +26,12 @@ class UserController extends GetxController {
     checkLoginStatus();
   }
 
-  void checkLoginStatus() {
+  void checkLoginStatus() async {
+    final SharedPreferences prefs = await _prefs;
+
     // Check if the user has previously logged in
-    if (hasLoggedInBefore()) {
+    if (prefs.getBool('hasLoggedIn') == true &&
+        prefs.getBool('rememberMe') == true) {
       isLoggedIn.value = true;
 
       // Schedule navigation to the home page after the current frame has been painted
@@ -51,39 +41,64 @@ class UserController extends GetxController {
     }
   }
 
-  void loginUser() async {
+  Future<void> loginUser() async {
     try {
       isLoading.value = true; // Show loading indicator
-
       final List<dynamic> users = await UserService.getUsers();
+      final SharedPreferences prefs = await _prefs;
+
+      _androidInfo = await _getDeviceId();
+      _androidId = _androidInfo.androidId;
+
+      bool loginSuccessful = false;
 
       for (var user in users) {
         if ((user['email'] == emailController.text ||
                 user['nip'] == emailController.text) &&
             user['password'] == passwordController.text) {
-          // Set the isLoggedIn flag to true if credentials are valid
-          isLoggedIn.value = true;
+          if (user['device_id'] == _androidId) {
+            // Set the isLoggedIn flag to true if credentials are valid
+            isLoggedIn.value = true;
 
-          // Save NIP to shared preferences
-          await saveNIP(user['nip']);
+            // Save NIP to shared preferences
+            await saveNIP(user['nip']);
 
-          // Set the flag indicating that the user has logged in
-          await setLoggedInFlag();
+            // Set the flag indicating that the user has logged in
+            await setLoggedInFlag();
 
-          // Show success snackbar
-          Get.snackbar('Success', 'Login successful',
-              backgroundColor: Colors.green, colorText: Colors.white);
+            // Save "Remember Me" preference
+            if (rememberMe.value) {
+              await prefs.setString('rememberedEmail', emailController.text);
+              await prefs.setBool('rememberMe', true);
+            } else {
+              await prefs.remove('rememberedEmail');
+              await prefs.remove('rememberMe');
+            }
 
-          // Navigate to the homepage
-          Get.offNamed('/home');
+            // Mark login as successful
+            loginSuccessful = true;
 
-          return;
+            // Show success snackbar
+            Get.snackbar('Success', 'Login successful',
+                backgroundColor: Colors.green, colorText: Colors.white);
+
+            // Navigate to the homepage
+            Get.offNamed('/home');
+            return;
+          } else {
+            Get.snackbar('Error ID', "Login Failed. Device ID doesn't match.",
+                backgroundColor: Colors.redAccent, colorText: Colors.white);
+            Get.offNamed('/login');
+            return;
+          }
         }
       }
 
-      // Show error snackbar for invalid credentials
-      Get.snackbar('Error', 'Invalid email/nip or password',
-          backgroundColor: Colors.red, colorText: Colors.white);
+      // Show error snackbar only if no matching user is found
+      if (!loginSuccessful) {
+        Get.snackbar('Error', 'Invalid email/nip or password',
+            backgroundColor: Colors.red, colorText: Colors.white);
+      }
     } catch (e) {
       print('Error: $e');
       // Show error snackbar for API call failure
@@ -92,5 +107,31 @@ class UserController extends GetxController {
     } finally {
       isLoading.value = false; // Hide loading indicator
     }
+  }
+
+  Future<AndroidDeviceInfo> _getDeviceId() async {
+    try {
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        print('Android ID: ${androidInfo.androidId}');
+        return androidInfo;
+      } else {
+        throw Exception('Unsupported platform');
+      }
+    } catch (e) {
+      print('Error getting device information: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> saveNIP(String nip) async {
+    final SharedPreferences prefs = await _prefs;
+    await prefs.setString('nip', nip);
+  }
+
+  Future<void> setLoggedInFlag() async {
+    final SharedPreferences prefs = await _prefs;
+    await prefs.setBool('hasLoggedIn', true);
   }
 }
