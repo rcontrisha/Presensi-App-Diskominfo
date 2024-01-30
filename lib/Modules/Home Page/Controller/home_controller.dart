@@ -1,5 +1,6 @@
 // home_controller.dart
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:maps/Modules/Login%20Page/View/login_view.dart';
@@ -24,20 +25,13 @@ class HomeController extends GetxController {
   RxList<Map<String, dynamic>> presenceData = <Map<String, dynamic>>[].obs;
   RxBool loadingAPI = true.obs;
   final RxBool _isLoading = true.obs;
-  final RxBool _isCheckInButtonVisible = false.obs;
-  final RxBool _isCheckOutButtonVisible = false.obs;
-  final RxBool _areButtonsDisabled = false.obs;
   late AndroidDeviceInfo _androidInfo;
   late String _androidId = '';
-  late bool loggedToday = false;
 
   bool _deviceInfoLoaded = false;
 
   Position? get currentPosition => _currentPosition.value;
   bool get isLoading => _isLoading.value;
-  bool get isCheckInButtonVisible => _isCheckInButtonVisible.value;
-  bool get isCheckOutButtonVisible => _isCheckOutButtonVisible.value;
-  bool get areButtonsDisabled => _areButtonsDisabled.value;
 
   String get androidId {
     if (!_deviceInfoLoaded) {
@@ -69,71 +63,12 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> checkCheckInCheckOutStatus() async {
-    final storedNIP = _sharedPreferences.getString('nip');
-
-    if (storedNIP != null) {
-      try {
-        // Get today's date
-        final today = DateTime.now();
-        final todayFormatted = DateFormat('yyyy-MM-dd').format(today);
-        print('Today Formatted: $todayFormatted');
-
-        // Set loggedToday to false initially
-        loggedToday = false;
-        print('Presence Data: $presenceData');
-
-        for (int i = 0; i < presenceData.length; i++) {
-          print(
-              'Server Tanggal: ${presenceData[i]['tanggal']}, Today Formatted: $todayFormatted');
-          if (presenceData[i]['tanggal'] == todayFormatted) {
-            loggedToday = true;
-            break;
-          }
-        }
-
-        print(loggedToday);
-      } catch (e) {
-        print('Error fetching presence data: $e');
-      }
-    }
-  }
-
-  void _showCheckInButton() {
-    // Update the state in your controller to show the Check In button
-    // For example, set a boolean flag like isCheckInButtonVisible to true
-    // and use it in your view to conditionally show the Check In button.
-    _isCheckInButtonVisible.value = true;
-    _isCheckOutButtonVisible.value =
-        false; // Make sure Check Out button is hidden
-  }
-
-  void _showCheckOutButton() {
-    // Update the state in your controller to show the Check Out button
-    // For example, set a boolean flag like isCheckOutButtonVisible to true
-    // and use it in your view to conditionally show the Check Out button.
-    _isCheckOutButtonVisible.value = true;
-    _isCheckInButtonVisible.value =
-        false; // Make sure Check In button is hidden
-  }
-
-  void _showBothButtonsDisabled() {
-    // Update the state in your controller to handle the case
-    // where both Check In and Check Out buttons are disabled.
-    // For example, set a boolean flag like areButtonsDisabled to true
-    // and use it in your view to conditionally disable both buttons.
-    _areButtonsDisabled.value = true;
-    _isCheckInButtonVisible.value = false;
-    _isCheckOutButtonVisible.value = false;
-  }
-
   Future<void> requestPermission() async {
     final PermissionStatus status = await Permission.location.request();
     if (status.isGranted) {
       await _getCurrentLocation();
       await _getDeviceId(); // Ensure _getDeviceId is called after obtaining location
       await fetchData();
-      await checkCheckInCheckOutStatus();
     } else {
       print('Location permission denied');
       _isLoading.value = false;
@@ -218,9 +153,8 @@ class HomeController extends GetxController {
           'nip': storedNIP,
           'latitude': currentPosition.latitude,
           'longitude': currentPosition.longitude,
-          'tanggal': DateTime.now(),
+          'waktu': DateTime.now(),
           'device_id': _androidId,
-          'status': 'masuk'
         };
 
         // Customize the API call according to your needs
@@ -257,19 +191,26 @@ class HomeController extends GetxController {
     String presensiMessage;
 
     if (distance != null) {
-      if (distance < 1000) {
+      if (distance < 300) {
         presensiMessage = 'Presensi Sukses!';
         postPresensi();
       } else {
         presensiMessage = 'Presensi Gagal - Distance is above 300m';
       }
 
-      Get.snackbar(
-        'Presensi Status',
-        presensiMessage,
-        snackPosition: SnackPosition.BOTTOM,
-        duration: Duration(seconds: 3),
-      );
+      if (presensiMessage == 'Presensi Sukses!') {
+        Get.snackbar('Presensi Status', presensiMessage,
+            snackPosition: SnackPosition.BOTTOM,
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.green[600],
+            colorText: Colors.white);
+      } else if (presensiMessage == 'Presensi Gagal - Distance is above 300m') {
+        Get.snackbar('Presensi Status', presensiMessage,
+            snackPosition: SnackPosition.BOTTOM,
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.red[600],
+            colorText: Colors.white);
+      }
     } else {
       print('Invalid distance value for showing presensi snackbar.');
     }
