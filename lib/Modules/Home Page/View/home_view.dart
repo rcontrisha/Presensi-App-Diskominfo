@@ -37,11 +37,8 @@ class HomePage extends StatelessWidget {
                               'Distance to Office: ${_controller.calculateDistance(_controller.currentPosition, CompanyData.office)} meters',
                               style: TextStyle(fontSize: 18),
                             ),
-                            SizedBox(height: 20),
                             ElevatedButton(
-                              onPressed: () {
-                                _controller.handlePresensi();
-                              },
+                              onPressed: _controller.handlePresensi,
                               child: Text('Presensi'),
                             ),
                             SizedBox(height: 20),
