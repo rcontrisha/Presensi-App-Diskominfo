@@ -36,7 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   geocoding: ^2.0.4
-  geolocator: ^8.2.0
+  geolocator:
   permission_handler: ^11.0.1
   get:
   maps_launcher: ^2.2.0
@@ -69,8 +69,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/images/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -84,10 +84,25 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: Kanit
+      fonts:
+        - asset: assets/fonts/Kanit-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Kanit-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Kanit-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Kanit-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Kanit-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Kanit-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Kanit-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Kanit-Black.ttf
+          weight: 900
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

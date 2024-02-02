@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PresenceService {
-  static const String baseUrl = "http://10.10.111.113/presenceAPI";
+  static const String baseUrl = "http://10.10.100.111/presenceAPI";
 
   Future<List<Map<String, dynamic>>> fetchData() async {
     final response = await http.get(Uri.parse('$baseUrl/view.php'));
@@ -56,7 +56,7 @@ class PresenceService {
       throw Exception("Failed to load presence history");
     }
   }
-  
+
   // Recursive function to convert DateTime objects to strings
   void _convertDateTimesToStrings(Map<String, dynamic> data) {
     data.forEach((key, value) {
