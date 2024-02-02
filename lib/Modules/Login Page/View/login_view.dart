@@ -86,29 +86,59 @@ class LoginScreen extends StatelessWidget {
                     maxLines: 1,
                     controller: userController.emailController,
                     decoration: InputDecoration(
-                      label: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          "NIP / Email",
-                          style: TextStyle(
-                            color: Color(0xFFB3B1B0),
-                            fontSize: 16,
-                            fontFamily: 'Kanit',
-                            fontWeight: FontWeight.w500,
+                        label: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            "NIP / Email",
+                            style: TextStyle(
+                              color: Color(0xFFB3B1B0),
+                              fontSize: 16,
+                              fontFamily: 'Kanit',
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Color(0xFFB3B1B0), width: 2)),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(
-                          width: 2,
-                          color: Color(0xFFB3B1B0)
-                        )
-                      )
-                    ),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide:
+                                BorderSide(color: Color(0xFFB3B1B0), width: 2)),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide(
+                                width: 2, color: Color(0xFFB3B1B0)))),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 10),
+                  child: TextFormField(
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Kanit'),
+                    maxLines: 1,
+                    controller: userController.passwordController,
+                    decoration: InputDecoration(
+                        label: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            "Password",
+                            style: TextStyle(
+                              color: Color(0xFFB3B1B0),
+                              fontSize: 16,
+                              fontFamily: 'Kanit',
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide:
+                                BorderSide(color: Color(0xFFB3B1B0), width: 2)),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide(
+                                width: 2, color: Color(0xFFB3B1B0)))),
                   ),
                 ),
               ],
