@@ -50,18 +50,130 @@ class PresencePage extends StatelessWidget {
                       );
                     } else {
                       final addressDetails = snapshot.data!;
-                      return ListTile(
-                        title: Text('NIP: ${presence['nip']}'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                'Lokasi: ${addressDetails.street}, ${addressDetails.district}, ${addressDetails.kecamatan}, ${addressDetails.city}, ${addressDetails.province}'),
-                            Text('Latitude: ${presence['latitude']}'),
-                            Text('Longitude: ${presence['longitude']}'),
-                            Text('Waktu Presensi: ${presence['waktu']}'),
-                            Text('Device ID: ${presence['device_id']}'),
-                          ],
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 10),
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          color: Colors.blue[300],
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Waktu Presensi',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal),
+                                    ),
+                                    Text(
+                                      '${DateFormat('EEEE, dd MMMM yyyy', 'id').format(DateTime.parse(presence['waktu']))}',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                  '${DateFormat('HH:mm:ss').format(DateTime.parse(presence['waktu']))}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Koordinat',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${presence['latitude']}, ${presence['longitude']}',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Device ID',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${presence['device_id']}',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 15),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Lokasi',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '${addressDetails.street}, ${addressDetails.district}, ${addressDetails.kecamatan}, ${addressDetails.city}, ${addressDetails.province}',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            // child: ListTile(
+                            //   textColor: Colors.white,
+                            //   title: Text(
+                            //       'Waktu Presensi\n${DateFormat('HH:mm:ss').format(DateTime.parse(presence['waktu']))}'),
+                            //   trailing: Text(
+                            //       '${DateFormat('yyyy-MM-dd').format(DateTime.parse(presence['waktu']))}'),
+                            //   subtitle: Column(
+                            //     crossAxisAlignment: CrossAxisAlignment.start,
+                            //     children: [
+                            //       Text(
+                            //           'Koordinat\n${presence['latitude']}, ${presence['longitude']}'),
+                            //       Text(
+                            //           'Lokasi: ${addressDetails.street}, ${addressDetails.district}, ${addressDetails.kecamatan}, ${addressDetails.city}, ${addressDetails.province}'),
+                            //       Text('Device ID\n${presence['device_id']}'),
+                            //     ],
+                            //   ),
+                            // ),
+                          ),
                         ),
                       );
                     }
