@@ -78,7 +78,7 @@ class HomePage extends StatelessWidget {
                                       elevation: 5,
                                       child: Center(
                                         child: Text(
-                                          "Inner Card b",
+                                          "Inner Card bangsat",
                                           style: TextStyle(fontSize: 16),
                                         ),
                                       ),
