@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'APSI',
-      initialRoute: AppRoutes.landing,
+      initialRoute: AppRoutes.home,
       getPages: AppRoutes.routes,
       theme: ThemeData(
         primarySwatch: Colors.blue,
