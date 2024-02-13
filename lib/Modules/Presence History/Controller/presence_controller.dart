@@ -35,11 +35,12 @@ class PresenceController extends GetxController {
 
   Future<void> fetchData() async {
     final storedNIP = _sharedPreferences.getString('nip');
+    final accessToken = _sharedPreferences.getString('token');
     try {
       print("Fetching data...");
       isLoading(true);
       List<Map<String, dynamic>> data =
-          await PresenceService().getPresenceByUser(storedNIP);
+          await PresenceService(accessToken!).fetchData();
       presenceData.assignAll(data);
     } catch (e) {
       print('Error: $e');
@@ -53,25 +54,28 @@ class PresenceController extends GetxController {
   Future<AddressDetails> getPlaceMarks(
       String latitude, String longitude) async {
     try {
-      double lat = double.parse(latitude);
-      double lon = double.parse(longitude);
-      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lon);
-
-      if (placemarks.isNotEmpty) {
-        Placemark placemark = placemarks[0];
-        return AddressDetails(
-            street: placemark.street ?? 'Unknown Street',
-            district: placemark.subLocality ?? 'Unknown District',
-            kecamatan: placemark.locality ?? 'Unknown Kecamatan',
-            city: placemark.subAdministrativeArea ?? 'Unknown City',
-            province: placemark.administrativeArea ?? 'Unknown Province');
+      double? lat = double.tryParse(latitude);
+      double? lon = double.tryParse(longitude);
+      if (lat != null && lon != null) {
+        List<Placemark> placemarks = await placemarkFromCoordinates(lat, lon);
+        if (placemarks.isNotEmpty) {
+          Placemark placemark = placemarks[0];
+          return AddressDetails(
+              street: placemark.street ?? 'Unknown Street',
+              district: placemark.subLocality ?? 'Unknown District',
+              kecamatan: placemark.locality ?? 'Unknown Kecamatan',
+              city: placemark.subAdministrativeArea ?? 'Unknown City',
+              province: placemark.administrativeArea ?? 'Unknown Province');
+        } else {
+          return AddressDetails(
+              street: 'Unknown Street',
+              district: 'Unknown District',
+              kecamatan: 'Unknown Kecamatan',
+              city: 'Unknown City',
+              province: 'Unknown province');
+        }
       } else {
-        return AddressDetails(
-            street: 'Unknown Street',
-            district: 'Unknown District',
-            kecamatan: 'Unknown Kecamatan',
-            city: 'Unknown City',
-            province: 'Unknown province');
+        throw Exception('Invalid latitude or longitude format');
       }
     } catch (e) {
       print('Error getting placemarks: $e');
@@ -80,7 +84,7 @@ class PresenceController extends GetxController {
           district: 'Unknown District',
           kecamatan: 'Unknown Kecamatan',
           city: 'Unknown City',
-          province: 'Unknown province');
+          province: 'Unknown Province');
     }
   }
 }

@@ -1,6 +1,6 @@
-// presence_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import '../Controller/presence_controller.dart';
 
@@ -9,9 +9,11 @@ class PresencePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    initializeDateFormatting('id', null); // Initialize Indonesian locale
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Presence History'),
+        title: Text('Riwayat Kehadiran'),
         centerTitle: true,
         backgroundColor: Colors.blue[700],
         foregroundColor: Colors.white,
@@ -21,7 +23,7 @@ class PresencePage extends StatelessWidget {
           if (_controller.isLoading.value) {
             return Center(child: CircularProgressIndicator());
           } else if (_controller.presenceData.isEmpty) {
-            return Center(child: Text('No data available.'));
+            return Center(child: Text('Tidak ada data.'));
           } else {
             return ListView.builder(
               itemCount: _controller.presenceData.length,
@@ -29,8 +31,10 @@ class PresencePage extends StatelessWidget {
                 final presence = _controller.presenceData[index];
                 return FutureBuilder<AddressDetails>(
                   future: _controller.getPlaceMarks(
-                    presence['latitude'],
-                    presence['longitude'],
+                    presence['latitude']?.toString() ??
+                        '', // Pastikan latitude tidak null
+                    presence['longitude']?.toString() ??
+                        '', // Pastikan longitude tidak null
                   ),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -41,32 +45,35 @@ class PresencePage extends StatelessWidget {
                     } else if (snapshot.hasError) {
                       return ListTile(
                         title: Text('NIP: ${presence['nip']}'),
-                        subtitle: Text('Error fetching location'),
+                        subtitle: Text('Gagal mengambil lokasi'),
                       );
                     } else if (!snapshot.hasData) {
                       return ListTile(
                         title: Text('NIP: ${presence['nip']}'),
-                        subtitle: Text('Location not found'),
+                        subtitle: Text('Lokasi tidak ditemukan'),
                       );
                     } else {
                       final addressDetails = snapshot.data!;
-                      String formattedDate = DateFormat('EEEE, MMM d, y')
-                          .format(DateTime.parse(presence['tanggal']));
+                      // Memisahkan waktu kehadiran menjadi tanggal dan waktu
+                      final DateTime presenceTime =
+                          DateTime.parse(presence['waktu']);
+                      final formattedDate = DateFormat.yMMMMEEEEd('id')
+                          .format(presenceTime); // Hari, d MMMM yyyy
+                      final formattedTime =
+                          DateFormat('HH:mm:ss').format(presenceTime);
                       return ListTile(
                         title: Text('NIP: ${presence['nip']}'),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                                'Location: ${addressDetails.street}, ${addressDetails.district}, ${addressDetails.kecamatan}, ${addressDetails.city}, ${addressDetails.province}'),
+                              'Lokasi: ${addressDetails.street}, ${addressDetails.district}, ${addressDetails.kecamatan}, ${addressDetails.city}, ${addressDetails.province}',
+                            ),
                             Text('Latitude: ${presence['latitude']}'),
                             Text('Longitude: ${presence['longitude']}'),
-                            Text('Date: ${presence['tanggal']}'),
-                            Text(
-                                'Check In: ${presence['check_in'] as String? ?? 'N/A'}'),
-                            Text(
-                                'Check Out: ${presence['check_out'] as String? ?? 'N/A'}'),
-                            Text('Device ID: ${presence['device_id']}'),
+                            Text('Tanggal: $formattedDate'),
+                            Text('Waktu: $formattedTime'),
+                            Text('ID Perangkat: ${presence['device_id']}'),
                           ],
                         ),
                       );

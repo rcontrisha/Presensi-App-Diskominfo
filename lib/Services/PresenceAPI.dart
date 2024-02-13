@@ -2,14 +2,26 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PresenceService {
-  static const String baseUrl = "http://10.10.100.111/presenceAPI";
+  static const String baseUrl = "http://10.10.111.85:8000/api";
+
+  // Token bearer
+  final String token;
+
+  PresenceService(this.token);
 
   Future<List<Map<String, dynamic>>> fetchData() async {
-    final response = await http.get(Uri.parse('$baseUrl/view.php'));
+    final response = await http.get(
+      Uri.parse('$baseUrl/presences'),
+      headers: {
+        'Authorization': 'Bearer $token'
+      }, // Include bearer token in the header
+    );
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> jsonResponse = json.decode(response.body);
-      List<Map<String, dynamic>> data = List.from(jsonResponse['data']);
+      List<dynamic> jsonResponse =
+          json.decode(response.body); // Parse the response as a list
+      List<Map<String, dynamic>> data =
+          List.from(jsonResponse); // Convert the list to a list of maps
       return data;
     } else {
       throw Exception('Failed to load data');
@@ -21,8 +33,11 @@ class PresenceService {
       _convertDateTimesToStrings(data);
 
       final response = await http.post(
-        Uri.parse('$baseUrl/post.php'),
-        headers: {"Content-Type": "application/json"},
+        Uri.parse('$baseUrl/post'),
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer $token', // Tambahkan token bearer ke header
+        },
         body: jsonEncode(data),
       );
 
@@ -40,22 +55,24 @@ class PresenceService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getPresenceByUser(String? nip) async {
-    final response =
-        await http.get(Uri.parse('$baseUrl/history_user.php?nip=$nip'));
+  // Future<List<Map<String, dynamic>>> getPresenceByUser(String? nip) async {
+  //   final response = await http.get(
+  //     Uri.parse('$baseUrl/history_user.php?nip=$nip'),
+  //     headers: {'Authorization': 'Bearer $token'}, // Tambahkan token bearer ke header
+  //   );
 
-    if (response.statusCode == 200) {
-      // If server returns an OK response, parse the JSON
-      final data = json.decode(response.body);
-      if (data['data'] != null) {
-        return List<Map<String, dynamic>>.from(data['data']);
-      } else {
-        throw Exception("No data available");
-      }
-    } else {
-      throw Exception("Failed to load presence history");
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     // If server returns an OK response, parse the JSON
+  //     final data = json.decode(response.body);
+  //     if (data['data'] != null) {
+  //       return List<Map<String, dynamic>>.from(data['data']);
+  //     } else {
+  //       throw Exception("No data available");
+  //     }
+  //   } else {
+  //     throw Exception("Failed to load presence history");
+  //   }
+  // }
 
   // Recursive function to convert DateTime objects to strings
   void _convertDateTimesToStrings(Map<String, dynamic> data) {
