@@ -21,8 +21,10 @@ class MyApp extends StatelessWidget {
       initialRoute: AppRoutes.home,
       getPages: AppRoutes.routes,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Color(0xFFFEFEFE),
       ),
     );
   }
 }
+
+
