@@ -29,82 +29,110 @@ class UserController extends GetxController {
     final SharedPreferences prefs = await _prefs;
 
     // Check if the user has previously logged in
+    if (prefs.getBool('hasLoggedIn') == true) {
+      // If "Remember me" is selected, retrieve the stored email
+      final rememberedEmail = prefs.getString('rememberedEmail');
+
+      if (rememberedEmail != null) {
+        // Set the email in the email controller
+        emailController.text = rememberedEmail;
+
+        // Log in the user with the stored email
+        loginUser();
+        return; // Exit the method to prevent navigation to home page
+      }
+    }
+
+    // If "Remember me" is not selected or no stored email, proceed with normal login check
     if (prefs.getBool('hasLoggedIn') == true &&
         prefs.getBool('rememberMe') == true) {
       isLoggedIn.value = true;
-
-      // Schedule navigation to the home page after the current frame has been painted
       WidgetsBinding.instance!.addPostFrameCallback((_) {
         Get.offNamed('/home');
       });
     }
   }
 
+// Ubah bagian loginUser() seperti berikut:
   Future<void> loginUser() async {
     try {
-      isLoading.value = true; // Show loading indicator
-      final List<dynamic> users = await UserService.getUsers();
+      isLoading.value = true; // Tampilkan indikator loading
+
       final SharedPreferences prefs = await _prefs;
 
       _androidInfo = await _getDeviceId();
       _androidId = _androidInfo.androidId;
 
-      bool loginSuccessful = false;
+      final String email = emailController.text;
 
-      for (var user in users) {
-        if ((user['email'] == emailController.text ||
-                user['nip'] == emailController.text) &&
-            user['password'] == passwordController.text) {
-          if (user['device_id'] == _androidId) {
-            // Set the isLoggedIn flag to true if credentials are valid
-            isLoggedIn.value = true;
+      // Check jika token belum kadaluarsa
+      final String? token = prefs.getString('token');
+      final int? tokenExpiration = prefs.getInt('tokenExpiration');
 
-            // Save NIP to shared preferences
-            await saveNIP(user['nip']);
+      if (token != null && tokenExpiration != null) {
+        final bool isTokenValid =
+            DateTime.now().millisecondsSinceEpoch < tokenExpiration;
 
-            // Set the flag indicating that the user has logged in
-            await setLoggedInFlag();
+        if (isTokenValid) {
+          // Token masih berlaku, gunakan token yang ada
+          isLoggedIn.value = true;
 
-            // Save "Remember Me" preference
-            if (rememberMe.value) {
-              await prefs.setString('rememberedEmail', emailController.text);
-              await prefs.setBool('rememberMe', true);
-            } else {
-              await prefs.remove('rememberedEmail');
-              await prefs.remove('rememberMe');
-            }
-
-            // Mark login as successful
-            loginSuccessful = true;
-
-            // Show success snackbar
-            Get.snackbar('Success', 'Login successful',
-                backgroundColor: Colors.green, colorText: Colors.white);
-
-            // Navigate to the homepage
+          // Schedule navigation to the home page after the current frame has been painted
+          WidgetsBinding.instance!.addPostFrameCallback((_) {
             Get.offNamed('/home');
-            return;
-          } else {
-            Get.snackbar('Error ID', "Login Failed. Device ID doesn't match.",
-                backgroundColor: Colors.redAccent, colorText: Colors.white);
-            Get.offNamed('/login');
-            return;
-          }
+          });
+
+          return; // Keluar dari fungsi karena login berhasil
         }
       }
 
-      // Show error snackbar only if no matching user is found
-      if (!loginSuccessful) {
-        Get.snackbar('Error', 'Invalid email/nip or password',
-            backgroundColor: Colors.red, colorText: Colors.white);
+      // Jika token sudah kadaluarsa atau tidak ada token sebelumnya,
+      // ambil token baru dari server
+      final responseData = await UserService.getUsers(
+        email,
+        _androidId,
+      );
+
+      final newToken = responseData['access_token'].split('|')[1];
+
+      print('New Token: $newToken'); // Debug print
+
+      // Set isLoggedIn ke true jika login berhasil
+      isLoggedIn.value = true;
+
+      // Simpan token ke shared preferences
+      await prefs.setString('token', newToken);
+
+      // Atur waktu kedaluwarsa token (contoh: 1 hari)
+      final int expiration = DateTime.now().millisecondsSinceEpoch +
+          Duration(days: 1).inMilliseconds;
+      await prefs.setInt('tokenExpiration', expiration);
+
+      // Simpan NIP ke shared preferences
+      await saveNIP(email); // Simpan NIP di sini
+
+      // Simpan preferensi "Remember Me"
+      if (rememberMe.value) {
+        await prefs.setString('rememberedEmail', email);
+        await prefs.setBool('rememberMe', true);
+      } else {
+        await prefs.remove('rememberedEmail');
+        await prefs.remove('rememberMe');
       }
+
+      // Tampilkan snackbar sukses
+      Get.snackbar('Success', 'Login successful',
+          backgroundColor: Colors.green, colorText: Colors.white);
+
+      // Arahkan ke halaman utama
+      Get.offNamed('/home');
     } catch (e) {
       print('Error: $e');
-      // Show error snackbar for API call failure
-      Get.snackbar('Error', 'Failed to load user data',
+      // Tampilkan snackbar error jika panggilan API gagal
+      Get.snackbar('Error', 'Failed to login',
           backgroundColor: Colors.red, colorText: Colors.white);
     } finally {
-      isLoading.value = false; // Hide loading indicator
+      isLoading.value = false; // Sembunyikan indikator loading
     }
   }
 
@@ -127,6 +155,10 @@ class UserController extends GetxController {
   Future<void> saveNIP(String nip) async {
     final SharedPreferences prefs = await _prefs;
     await prefs.setString('nip', nip);
+
+    // Retrieve the stored NIP and print it for debugging
+    final storedNIP = prefs.getString('nip');
+    print('Stored NIP: $storedNIP');
   }
 
   Future<void> setLoggedInFlag() async {

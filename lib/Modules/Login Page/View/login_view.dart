@@ -54,11 +54,10 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
             Container(
-              height: MediaQuery.of(context).size.height * 58 / 100,
               width: MediaQuery.of(context).size.width,
               color: const Color(0xFFFEFEFE),
-              padding:
-              const EdgeInsets.only(left: 20, right: 20, top: 26, bottom: 84),
+              padding: const EdgeInsets.only(
+                  left: 20, right: 20, top: 26, bottom: 84),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,8 +113,7 @@ class LoginScreen extends StatelessWidget {
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(
-                              width: 1.5, color: Color(0xFFB3B1B0)
-                          ),
+                              width: 1.5, color: Color(0xFFB3B1B0)),
                         ),
                       ),
                     ),
@@ -158,23 +156,26 @@ class LoginScreen extends StatelessWidget {
                           enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: const BorderSide(
-                                  width: 1.5, color: Color(0xFFB3B1B0)
-                              )
-                          )
-                      ),
+                                  width: 1.5, color: Color(0xFFB3B1B0)))),
                     ),
                   ),
-                  SizedBox(height: 15,),
+                  SizedBox(
+                    height: 15,
+                  ),
                   Row(
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(left: 3.0),
                         child: Obx(
-                              () => Checkbox(
+                          () => Checkbox(
                             value: userController.rememberMe.value,
                             onChanged: (value) {
+                              print(
+                                  'Checkbox value changed: $value'); // Debug print
                               userController.rememberMe.value =
-                              !userController.rememberMe.value;
+                                  !userController.rememberMe.value;
+                              print(
+                                  'Remember me value: ${userController.rememberMe.value}'); // Debug print
                             },
                           ),
                         ),
@@ -185,12 +186,13 @@ class LoginScreen extends StatelessWidget {
                             color: Color(0xFFB3B1B0),
                             fontSize: 15,
                             fontFamily: 'Kanit',
-                            fontWeight: FontWeight.w600
-                        ),
+                            fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
-                  SizedBox(height: 30,),
+                  SizedBox(
+                    height: 30,
+                  ),
                   Center(
                     child: ElevatedButton(
                         onPressed: userController.loginUser,
@@ -207,10 +209,8 @@ class LoginScreen extends StatelessWidget {
                           style: TextStyle(
                               fontSize: 18,
                               fontFamily: 'Kanit',
-                              fontWeight: FontWeight.w600
-                          ),
-                        )
-                    ),
+                              fontWeight: FontWeight.w600),
+                        )),
                   )
                 ],
               ),

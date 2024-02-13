@@ -54,12 +54,14 @@ class HomeController extends GetxController {
 
   Future<void> fetchData() async {
     final storedNIP = _sharedPreferences.getString('nip');
+    final accessToken = _sharedPreferences.getString('token');
     try {
       print("Fetching data...");
       loadingAPI(true);
       List<Map<String, dynamic>> data =
-          await PresenceService().getPresenceByUser(storedNIP);
+          await PresenceService(accessToken!).fetchData();
       presenceData.assignAll(data);
+      print("Response Data: $data"); // Debug print for response
     } catch (e) {
       print('Error: $e');
       // Handle error as needed
@@ -69,71 +71,12 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> checkCheckInCheckOutStatus() async {
-    final storedNIP = _sharedPreferences.getString('nip');
-
-    if (storedNIP != null) {
-      try {
-        // Get today's date
-        final today = DateTime.now();
-        final todayFormatted = DateFormat('yyyy-MM-dd').format(today);
-        print('Today Formatted: $todayFormatted');
-
-        // Set loggedToday to false initially
-        loggedToday = false;
-        print('Presence Data: $presenceData');
-
-        for (int i = 0; i < presenceData.length; i++) {
-          print(
-              'Server Tanggal: ${presenceData[i]['tanggal']}, Today Formatted: $todayFormatted');
-          if (presenceData[i]['tanggal'] == todayFormatted) {
-            loggedToday = true;
-            break;
-          }
-        }
-
-        print(loggedToday);
-      } catch (e) {
-        print('Error fetching presence data: $e');
-      }
-    }
-  }
-
-  void _showCheckInButton() {
-    // Update the state in your controller to show the Check In button
-    // For example, set a boolean flag like isCheckInButtonVisible to true
-    // and use it in your view to conditionally show the Check In button.
-    _isCheckInButtonVisible.value = true;
-    _isCheckOutButtonVisible.value =
-        false; // Make sure Check Out button is hidden
-  }
-
-  void _showCheckOutButton() {
-    // Update the state in your controller to show the Check Out button
-    // For example, set a boolean flag like isCheckOutButtonVisible to true
-    // and use it in your view to conditionally show the Check Out button.
-    _isCheckOutButtonVisible.value = true;
-    _isCheckInButtonVisible.value =
-        false; // Make sure Check In button is hidden
-  }
-
-  void _showBothButtonsDisabled() {
-    // Update the state in your controller to handle the case
-    // where both Check In and Check Out buttons are disabled.
-    // For example, set a boolean flag like areButtonsDisabled to true
-    // and use it in your view to conditionally disable both buttons.
-    _areButtonsDisabled.value = true;
-    _isCheckInButtonVisible.value = false;
-    _isCheckOutButtonVisible.value = false;
-  }
-
   Future<void> requestPermission() async {
     final PermissionStatus status = await Permission.location.request();
     if (status.isGranted) {
       await _getCurrentLocation();
       await _getDeviceId(); // Ensure _getDeviceId is called after obtaining location
       await fetchData();
-      await checkCheckInCheckOutStatus();
     } else {
       print('Location permission denied');
       _isLoading.value = false;
@@ -207,6 +150,7 @@ class HomeController extends GetxController {
 
   Future<void> postPresensi() async {
     final storedNIP = _sharedPreferences.getString('nip');
+    final accessToken = _sharedPreferences.getString('token');
     final currentPosition = _currentPosition.value;
     print('Stored NIP: $storedNIP');
     print('Current Position: $currentPosition');
@@ -218,13 +162,12 @@ class HomeController extends GetxController {
           'nip': storedNIP,
           'latitude': currentPosition.latitude,
           'longitude': currentPosition.longitude,
-          'tanggal': DateTime.now(),
+          'waktu': DateTime.now(),
           'device_id': _androidId,
-          'status': 'masuk'
         };
 
         // Customize the API call according to your needs
-        await PresenceService().postData(presensiData);
+        await PresenceService(accessToken!).postData(presensiData);
         print('Presensi posted successfully');
       } catch (e) {
         print('Error posting presensi: $e');
