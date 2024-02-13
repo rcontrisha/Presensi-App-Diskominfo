@@ -45,6 +45,8 @@ dependencies:
   intl: ^0.19.0
   shared_preferences: ^2.2.2
   device_info: ^2.0.3
+  flutter_svg: ^2.0.9
+  timezone: ^0.9.2
 
 dev_dependencies:
   flutter_test:
@@ -103,6 +105,14 @@ flutter:
           weight: 800
         - asset: assets/fonts/Kanit-Black.ttf
           weight: 900
+    - family: Sans
+      fonts:
+        - asset: assets/fonts/OpenSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/OpenSans-BoldItalic.ttf
+        - asset: assets/fonts/OpenSans-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/OpenSans-ExtraBoldItalic.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
