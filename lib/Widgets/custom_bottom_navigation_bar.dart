@@ -17,7 +17,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
             bottom: 0,
             child: Container(
               height: 65,
-              width: MediaQuery.of(context).size.width, // Menambahkan ketinggian container untuk menyesuaikan dengan tombol presensi di luar batas atas navbar
+              width: MediaQuery.of(context).size.width, // Menambahkan ketinggian container untuk menyesuaikan dengan tombol presensi di luar batas atas navbar.
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(color: Color(0xFFD4D3D2), width: 1),
