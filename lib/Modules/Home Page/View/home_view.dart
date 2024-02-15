@@ -327,7 +327,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             String loc = "(-7.3320625, 110.5009375)";
                             String time = "0${index + 7}:39 AM";
 
-                            return BlogTile(
+                            return ListTile(
                               time: time,
                               loc: loc,
                             );
@@ -352,11 +352,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 }
 
-class BlogTile extends StatelessWidget {
+class ListTile extends StatelessWidget {
   final String time;
   final String loc;
 
-  const BlogTile({
+  const ListTile({
     Key? key,
     required this.time,
     required this.loc,

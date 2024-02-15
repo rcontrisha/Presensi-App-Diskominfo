@@ -26,7 +26,45 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               CircleAvatar(
                 radius: 70,
-              )
+              ),
+              SizedBox(height: 20,),
+              Column(
+                children: [
+                  Text(
+                    "Dilo Syuja Sherlieno",
+                    style: TextStyle(
+                      color: Color(0xFF000000),
+                      fontFamily: 'Kanit',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(height: 5,),
+                  Text(
+                    "Pengawas II",
+                    style: TextStyle(
+                      color: Color(0xFFB3B1B0),
+                      fontFamily: 'Kanit',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 70,),
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  border: Border.all(width: 35),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    border: Border.all(width: 35, color: Colors.transparent),
+                    color: Colors.yellowAccent
+                ),
+              ),
             ],
           ),
         ),
