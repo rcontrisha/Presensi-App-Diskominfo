@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class UserService {
-  static const String apiUrl = 'http://10.10.111.85:8000/api/login';
+  static const String apiUrl = 'http://10.10.111.4:8000/api/login';
 
   static Future<Map<String, dynamic>> getUsers(
       String nip, String deviceId) async {
