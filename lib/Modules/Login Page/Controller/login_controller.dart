@@ -88,7 +88,7 @@ class UserController extends GetxController {
 
       // Jika token sudah kadaluarsa atau tidak ada token sebelumnya,
       // ambil token baru dari server
-      final responseData = await UserService.getUsers(
+      final responseData = await UserService.getUsersToken(
         email,
         _androidId,
       );

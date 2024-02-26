@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../../Widgets/custom_bottom_navigation_bar.dart';
 import '../../Presence History/View/presence_view.dart';
 import '../Controller/home_controller.dart';
@@ -48,6 +49,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         if (_controller.isLoading) {
           return Center(child: CircularProgressIndicator());
         } else {
+          final List<Map<String, dynamic>> latestPresences =
+              _controller.presenceData.length > 2
+                  ? _controller.presenceData
+                      .sublist(_controller.presenceData.length - 2)
+                  : _controller.presenceData;
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(left: 27.0, right: 27.0, top: 8),
@@ -58,7 +64,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       children: [
                         Row(
                           children: [
-                            CircleAvatar(radius: 40),
+                            CircleAvatar(
+                              radius: 40,
+                              backgroundImage: NetworkImage(_controller
+                                  .userImageUrl), // Menampilkan gambar dari URL
+                            ),
                             Padding(
                               padding: const EdgeInsets.only(left: 18.0),
                               child: Column(
@@ -75,7 +85,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   ),
                                   SizedBox(height: 2),
                                   Text(
-                                    "Dilo Syuja Sherlieno",
+                                    "${_controller.userData[0]['nama']}",
                                     style: TextStyle(
                                       color: Color(0xFF000000),
                                       fontFamily: 'Kanit',
@@ -212,12 +222,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
-                          itemCount: 2,
+                          itemCount: latestPresences.length,
                           itemBuilder: (context, index) {
                             String time = "0${index + 7}:39 AM";
+                            final presence =
+                                latestPresences.reversed.toList()[index];
+                            final waktu = presence[
+                                'waktu']; // Ambil nilai waktu dari data presensi
+                            final dateTime = DateTime.parse(
+                                waktu); // Ubah string waktu menjadi objek DateTime
+                            final formattedDate = DateFormat('dd MMMM yyyy').format(
+                                dateTime); // Format tanggal menjadi "27 Februari 2024"
+
+                            // Ambil bagian waktu dari jam
+                            // final time = DateFormat.jm().format(
+                            //     dateTime); // Format waktu menjadi "1:30 PM" atau "13:30" (tergantung pada konfigurasi lokal)
 
                             return ListTile(
                               time: time,
+                              date: formattedDate,
                             );
                           },
                         ),
@@ -334,10 +357,12 @@ Widget _buildJamCard(Stream<String> timeStream) {
 
 class ListTile extends StatelessWidget {
   final String time;
+  final String date;
 
   const ListTile({
     Key? key,
     required this.time,
+    required this.date,
   }) : super(key: key);
 
   @override
@@ -384,7 +409,7 @@ class ListTile extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topRight,
                   child: Text(
-                    "19 Januari 2024",
+                    date,
                     maxLines: 1,
                     style: const TextStyle(
                       color: Color(0xFFFEFEFE),
