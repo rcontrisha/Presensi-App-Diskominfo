@@ -1,9 +1,11 @@
 // home_controller.dart
+import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:maps/Modules/Login%20Page/View/login_view.dart';
 import 'package:maps/Services/PresenceAPI.dart';
+import 'package:maps/Services/UsersAPI.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maps_launcher/maps_launcher.dart';
@@ -22,6 +24,7 @@ class CompanyData {
 class HomeController extends GetxController {
   final Rx<Position?> _currentPosition = Rx<Position?>(null);
   RxList<Map<String, dynamic>> presenceData = <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> userData = <Map<String, dynamic>>[].obs;
   RxBool loadingAPI = true.obs;
   final RxBool _isLoading = true.obs;
   final RxBool _isCheckInButtonVisible = false.obs;
@@ -30,6 +33,8 @@ class HomeController extends GetxController {
   late AndroidDeviceInfo _androidInfo;
   late String _androidId = '';
   late bool loggedToday = false;
+  final RxList<Map<String, dynamic>> _officeData = <Map<String, dynamic>>[].obs;
+  String userImageUrl = ''; // URL gambar pengguna
 
   bool _deviceInfoLoaded = false;
 
@@ -38,6 +43,7 @@ class HomeController extends GetxController {
   bool get isCheckInButtonVisible => _isCheckInButtonVisible.value;
   bool get isCheckOutButtonVisible => _isCheckOutButtonVisible.value;
   bool get areButtonsDisabled => _areButtonsDisabled.value;
+  RxList<Map<String, dynamic>> get officeData => _officeData;
 
   String get androidId {
     if (!_deviceInfoLoaded) {
@@ -50,6 +56,27 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     requestPermission();
+    fetchOfficeData();
+    fetchUserImage();
+  }
+
+  Future<void> fetchOfficeData() async {
+    final accessToken = _sharedPreferences.getString('token');
+    try {
+      final officeData = await PresenceService(accessToken!).fetchKantorData();
+
+      // Menangani respons sebagai Map<String, dynamic>
+      if (officeData.isNotEmpty) {
+        // Jika data kantor tidak kosong, tambahkan data ke _officeData
+        _officeData.add(officeData);
+        print('Office data: $officeData');
+      } else {
+        // Jika data kantor kosong, tampilkan pesan atau lakukan tindakan lain
+        print('Office data is empty');
+      }
+    } catch (e) {
+      print('Error fetching office data: $e');
+    }
   }
 
   Future<void> fetchData() async {
@@ -62,12 +89,24 @@ class HomeController extends GetxController {
           await PresenceService(accessToken!).fetchData();
       presenceData.assignAll(data);
       print("Response Data: $data"); // Debug print for response
+      fetchUserByNip(storedNIP!);
     } catch (e) {
       print('Error: $e');
       // Handle error as needed
     } finally {
       loadingAPI(false);
       print("Data fetching completed.");
+    }
+  }
+
+  Future<void> fetchUserImage() async {
+    final storedNIP = _sharedPreferences.getString('nip');
+    try {
+      final imageUrl = await UserService.getUserImage(storedNIP!);
+      userImageUrl = imageUrl; // Gunakan respons langsung sebagai URL gambar
+      print('User image URL: $userImageUrl');
+    } catch (e) {
+      print('Error fetching user image: $e');
     }
   }
 
@@ -130,6 +169,21 @@ class HomeController extends GetxController {
     }
   }
 
+  // Method untuk mengambil data user sesuai dengan NIP
+  Future<void> fetchUserByNip(String nip) async {
+    try {
+      // Panggil method getUsers dari UserService untuk mendapatkan data user berdasarkan NIP
+      final userDataFromServer =
+          await UserService.getUsersByNipAndDeviceId(nip);
+
+      // Update nilai userData dengan data user yang diperoleh
+      userData.value = [userDataFromServer];
+      print(userData);
+    } catch (e) {
+      print('Error fetching user data by NIP: $e');
+    }
+  }
+
   double calculateDistance(
       Position? currentLocation, Map<String, dynamic>? office) {
     double distance = 0.0;
@@ -138,8 +192,8 @@ class HomeController extends GetxController {
       distance = Geolocator.distanceBetween(
         currentLocation.latitude,
         currentLocation.longitude,
-        office['latitude'],
-        office['longitude'],
+        _officeData[0]['latitude'],
+        _officeData[0]['longitude'],
       );
       distance = double.parse(distance.toStringAsFixed(2));
     } else {
@@ -189,7 +243,9 @@ class HomeController extends GetxController {
     final storedNIP = _sharedPreferences.getString('nip');
 
     if (currentPosition != null) {
-      double distance = calculateDistance(currentPosition, CompanyData.office);
+      double distance = calculateDistance(currentPosition, _officeData[0]);
+      print('Office coordinates: ${_officeData[0]}');
+      print('Distance to office: $distance meters');
       showPresensiSnackbar(distance);
     } else {
       print('Unable to calculate distance. Location not available.');
@@ -198,13 +254,14 @@ class HomeController extends GetxController {
 
   void showPresensiSnackbar(double distance) {
     String presensiMessage;
+    double radius = double.parse(_officeData[0]['radius']);
 
     if (distance != null) {
-      if (distance < 1000) {
+      if (distance < radius) {
         presensiMessage = 'Presensi Sukses!';
         postPresensi();
       } else {
-        presensiMessage = 'Presensi Gagal - Distance is above 300m';
+        presensiMessage = 'Presensi Gagal - Distance is above ${radius}m';
       }
 
       Get.snackbar(
