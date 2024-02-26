@@ -14,7 +14,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final HomeController _controller = Get.put(HomeController());
-  late Stream<String> _timeStream = Stream.empty();
   late AnimationController _opacityController;
 
   @override
@@ -22,8 +21,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
     // Initialize the timezone database
     tzf_data.initializeTimeZones();
-    // Initialize the time stream
-    _timeStream = TimeUtils.getWIBTimeStream();
     // Set initial time
     _opacityController = AnimationController(
       vsync: this,
@@ -40,6 +37,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double containerHeight = MediaQuery.of(context).size.height;
+    late Stream<String> _timeStream = TimeUtils.getWIBTimeStream(); // Moved declaration here
 
     return Scaffold(
       appBar: AppBar(
@@ -62,7 +60,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           children: [
                             CircleAvatar(radius: 40),
                             Padding(
-                              padding: const EdgeInsets.only(left: 15.0),
+                              padding: const EdgeInsets.only(left: 18.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -75,13 +73,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       fontWeight: FontWeight.w400,
                                     ),
                                   ),
-                                  SizedBox(height: 3),
+                                  SizedBox(height: 2),
                                   Text(
                                     "Dilo Syuja Sherlieno",
                                     style: TextStyle(
                                       color: Color(0xFF000000),
                                       fontFamily: 'Kanit',
                                       fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    "10000001",
+                                    style: TextStyle(
+                                      color: Color(0xFF000000),
+                                      fontFamily: 'Kanit',
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   )
@@ -94,161 +102,43 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         Container(
                           width: screenWidth - 27.0 * 2,
                           height: containerHeight - 135 - 545,
-                          child: Card(
-                            color: Color(0xFF04A3EA),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            elevation: 4,
-                            child: Stack(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Pengawas II",
-                                        style: TextStyle(
-                                          color: Color(0xFFFEFEFE),
-                                          fontFamily: 'Kanit',
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      Text(
-                                        "10000001",
-                                        style: TextStyle(
-                                          color: Color(0xFFFEFEFE),
-                                          fontFamily: 'Kanit',
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      )
-                                    ],
-                                  ),
+                          child: Stack(
+                            children: [
+                              // Kontainer Biru dan Gambar
+                              Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF04A3EA),
+                                  borderRadius: BorderRadius.circular(15.0),
                                 ),
-                                Positioned.fill(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                    child: Opacity(
-                                      opacity: 0.65,
+                                child: Stack(
+                                  children: [
+                                    // Gambar
+                                    Positioned.fill(
                                       child: Image.asset(
                                         'assets/images/home.png',
                                         fit: BoxFit.cover,
                                       ),
                                     ),
-                                  ),
-                                ),
-                                Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 85.0, bottom: 13, left: 15, right: 15),
-                                    child: Container(
-                                      width: 320,
-                                      height: 72,
-                                      child: Card(
-                                        color: Color(0xFFF7EF17),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12.0),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 30.0),
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              Positioned(
-                                                left: 15,
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      "Presensi",
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontFamily: 'Kanit',
-                                                        fontWeight: FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "07:39 AM",
-                                                      style: TextStyle(
-                                                        fontSize: 15,
-                                                        fontFamily: 'Sans',
-                                                        fontWeight: FontWeight.w800,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: 125,
-                                                child: Container(
-                                                  width: 1.5,
-                                                  height: 40,
-                                                  color: Color(0xFF272528),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                right: 0,
-                                                child: StreamBuilder<String>(
-                                                  stream: _timeStream,
-                                                  builder: (context, snapshot) {
-                                                    if (snapshot.hasData) {
-                                                      final timeParts = snapshot.data!.split(':');
-                                                      final hourPart = timeParts[0];
-                                                      final minutePart = timeParts[1];
-                                                      final isPM = int.parse(hourPart) >= 12;
-
-                                                      return Padding(
-                                                        padding: const EdgeInsets.only(top: 0, right: 0), // Sesuaikan padding kanan agar tidak terlalu rapat dengan tepi layar
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                                          children: [
-                                                            Text(
-                                                              '$hourPart', // Tampilkan jam
-                                                              style: TextStyle(fontSize: 32, fontFamily: 'Sans', fontWeight: FontWeight.w800, fontStyle: FontStyle.italic),
-                                                            ),
-                                                            Opacity(
-                                                              opacity: DateTime.now().second % 2 == 0 ? 1.0 : 0.0, // Set opacity menjadi 0 atau 1 bergantung pada detik genap atau ganjil
-                                                              child: Text(
-                                                                ':',
-                                                                style: TextStyle(
-                                                                  fontSize: 29,
-                                                                  fontFamily: 'Sans',
-                                                                  fontWeight: FontWeight.w800,
-                                                                  fontStyle: FontStyle.italic
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              '$minutePart', // Tampilkan menit
-                                                              style: TextStyle(fontSize: 32, fontFamily: 'Sans', fontWeight: FontWeight.w800, fontStyle: FontStyle.italic),
-                                                            ),
-                                                            SizedBox(width: 5), // Beri sedikit jarak antara jam dan AM/PM
-                                                          ],
-                                                        ),
-                                                      );
-                                                    } else {
-                                                      return Text(
-                                                        'Loading...',
-                                                        style: TextStyle(fontSize: 16),
-                                                      );
-                                                    }
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                    // Kontainer Biru
+                                    Padding(
+                                      padding: const EdgeInsets.all(8),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start, // Mengatur konten untuk tidak tertumpuk
+                                        children: [
+                                          // Bagian kiri (Presensi)
+                                          _buildPresensiCard(),
+                                          SizedBox(width: 5), // Beri sedikit jarak antara dua card
+                                          // Bagian kanan (Jam dan Tanggal)
+                                          _buildJamCard(_timeStream),
+                                        ],
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                         SizedBox(height: 9),
@@ -324,12 +214,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           physics: NeverScrollableScrollPhysics(),
                           itemCount: 2,
                           itemBuilder: (context, index) {
-                            String loc = "(-7.3320625, 110.5009375)";
                             String time = "0${index + 7}:39 AM";
 
-                            return BlogTile(
+                            return ListTile(
                               time: time,
-                              loc: loc,
                             );
                           },
                         ),
@@ -352,14 +240,104 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 }
 
-class BlogTile extends StatelessWidget {
-  final String time;
-  final String loc;
+Widget _buildPresensiCard() {
+  return Card(
+    color: Color(0xFFF7EF17),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12.0),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 30.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "Presensi\nTerakhir",
+            style: TextStyle(
+              fontSize: 15,
+              fontFamily: 'Kanit',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 7), // Beri sedikit jarak antara teks
+          Text(
+            "07:39 AM", // Anda dapat mempertahankan waktu ini atau menyesuaikannya dengan logika aplikasi Anda
+            style: TextStyle(
+              fontSize: 16,
+              fontFamily: 'Sans',
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
-  const BlogTile({
+Widget _buildJamCard(Stream<String> timeStream) {
+  return Card(
+    color: Color(0xFFF7EF17),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12.0),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30.0), // Mengurangi padding vertikal
+      child: StreamBuilder<String>(
+        stream: timeStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final timeParts = snapshot.data!.split(':');
+            final hourPart = timeParts[0];
+            final minutePart = timeParts[1];
+
+            final hari = DateTime.now().weekday;
+            final tanggal = DateTime.now().day;
+            final bulan = DateTime.now().month;
+            final tahun = DateTime.now().year;
+
+            final hariStr = [
+              'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'
+            ][hari - 1]; // -1 karena weekday dimulai dari 1
+
+            final bulanStr = [
+              'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+            ][bulan - 1]; // -1 karena month dimulai dari 1
+
+            return Column(
+              mainAxisSize: MainAxisSize.min, // Set mainAxisSize menjadi min
+              mainAxisAlignment: MainAxisAlignment.start, // Set mainAxisAlignment menjadi start
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$hariStr, $tanggal $bulanStr $tahun', // Tampilkan tanggal dan jam
+                  style: TextStyle(fontSize: 14, fontFamily: 'Sans', fontWeight: FontWeight.w500,),
+                ),
+                SizedBox(height: 10), // Tambahkan jarak antara tanggal dan jam
+                Text(
+                  '$hourPart:${minutePart}', // Tampilkan jam dan menit
+                  style: TextStyle(fontSize: 32, fontFamily: 'Sans', fontWeight: FontWeight.w800,),
+                ),
+              ],
+            );
+          } else {
+            return Text(
+              'Loading...',
+              style: TextStyle(fontSize: 16),
+            );
+          }
+        },
+      ),
+    ),
+  );
+}
+
+class ListTile extends StatelessWidget {
+  final String time;
+
+  const ListTile({
     Key? key,
     required this.time,
-    required this.loc,
   }) : super(key: key);
 
   @override

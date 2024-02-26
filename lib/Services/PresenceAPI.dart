@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PresenceService {
-  static const String baseUrl = "http://10.10.111.85:8000/api";
+  static const String baseUrl = "http://10.10.111.4:8000/api";
 
   // Token bearer
   final String token;
