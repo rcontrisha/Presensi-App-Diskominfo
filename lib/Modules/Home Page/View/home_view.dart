@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../../Widgets/custom_bottom_navigation_bar.dart';
 import '../../Presence History/View/presence_view.dart';
 import '../Controller/home_controller.dart';
@@ -50,6 +51,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         if (_controller.isLoading) {
           return Center(child: CircularProgressIndicator());
         } else {
+          final List<Map<String, dynamic>> latestPresences =
+              _controller.presenceData.length > 2
+                  ? _controller.presenceData
+                      .sublist(_controller.presenceData.length - 2)
+                  : _controller.presenceData;
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(left: 27.0, right: 27.0, top: 8),
@@ -60,7 +66,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       children: [
                         Row(
                           children: [
-                            CircleAvatar(radius: 40),
+                            CircleAvatar(
+                              radius: 40,
+                              backgroundImage: NetworkImage(_controller
+                                  .userImageUrl), // Menampilkan gambar dari URL
+                            ),
                             Padding(
                               padding: const EdgeInsets.only(left: 15.0),
                               child: Column(
@@ -77,7 +87,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   ),
                                   SizedBox(height: 3),
                                   Text(
-                                    "Dilo Syuja Sherlieno",
+                                    "${_controller.userData[0]['nama']}",
                                     style: TextStyle(
                                       color: Color(0xFF000000),
                                       fontFamily: 'Kanit',
@@ -103,10 +113,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             child: Stack(
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 25.0, vertical: 20),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "Pengawas II",
@@ -118,7 +130,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         ),
                                       ),
                                       Text(
-                                        "10000001",
+                                        "${_controller.userData[0]['nip']}",
                                         style: TextStyle(
                                           color: Color(0xFFFEFEFE),
                                           fontFamily: 'Kanit',
@@ -143,32 +155,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ),
                                 Center(
                                   child: Padding(
-                                    padding: const EdgeInsets.only(top: 85.0, bottom: 13, left: 15, right: 15),
+                                    padding: const EdgeInsets.only(
+                                        top: 85.0,
+                                        bottom: 13,
+                                        left: 15,
+                                        right: 15),
                                     child: Container(
                                       width: 320,
                                       height: 72,
                                       child: Card(
                                         color: Color(0xFFF7EF17),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12.0),
+                                          borderRadius:
+                                              BorderRadius.circular(12.0),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 30.0),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 10.0, horizontal: 30.0),
                                           child: Stack(
                                             alignment: Alignment.center,
                                             children: [
                                               Positioned(
                                                 left: 15,
                                                 child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
                                                   children: [
                                                     Text(
                                                       "Presensi",
                                                       style: TextStyle(
                                                         fontSize: 14,
                                                         fontFamily: 'Kanit',
-                                                        fontWeight: FontWeight.w500,
+                                                        fontWeight:
+                                                            FontWeight.w500,
                                                       ),
                                                     ),
                                                     Text(
@@ -176,7 +197,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                       style: TextStyle(
                                                         fontSize: 15,
                                                         fontFamily: 'Sans',
-                                                        fontWeight: FontWeight.w800,
+                                                        fontWeight:
+                                                            FontWeight.w800,
                                                       ),
                                                     ),
                                                   ],
@@ -196,45 +218,89 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                   stream: _timeStream,
                                                   builder: (context, snapshot) {
                                                     if (snapshot.hasData) {
-                                                      final timeParts = snapshot.data!.split(':');
-                                                      final hourPart = timeParts[0];
-                                                      final minutePart = timeParts[1];
-                                                      final isPM = int.parse(hourPart) >= 12;
+                                                      final timeParts = snapshot
+                                                          .data!
+                                                          .split(':');
+                                                      final hourPart =
+                                                          timeParts[0];
+                                                      final minutePart =
+                                                          timeParts[1];
+                                                      final isPM =
+                                                          int.parse(hourPart) >=
+                                                              12;
 
                                                       return Padding(
-                                                        padding: const EdgeInsets.only(top: 0, right: 0), // Sesuaikan padding kanan agar tidak terlalu rapat dengan tepi layar
+                                                        padding: const EdgeInsets
+                                                            .only(
+                                                            top: 0,
+                                                            right:
+                                                                0), // Sesuaikan padding kanan agar tidak terlalu rapat dengan tepi layar
                                                         child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
                                                           children: [
                                                             Text(
                                                               '$hourPart', // Tampilkan jam
-                                                              style: TextStyle(fontSize: 32, fontFamily: 'Sans', fontWeight: FontWeight.w800, fontStyle: FontStyle.italic),
+                                                              style: TextStyle(
+                                                                  fontSize: 32,
+                                                                  fontFamily:
+                                                                      'Sans',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w800,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic),
                                                             ),
                                                             Opacity(
-                                                              opacity: DateTime.now().second % 2 == 0 ? 1.0 : 0.0, // Set opacity menjadi 0 atau 1 bergantung pada detik genap atau ganjil
+                                                              opacity: DateTime.now()
+                                                                              .second %
+                                                                          2 ==
+                                                                      0
+                                                                  ? 1.0
+                                                                  : 0.0, // Set opacity menjadi 0 atau 1 bergantung pada detik genap atau ganjil
                                                               child: Text(
                                                                 ':',
                                                                 style: TextStyle(
-                                                                  fontSize: 29,
-                                                                  fontFamily: 'Sans',
-                                                                  fontWeight: FontWeight.w800,
-                                                                  fontStyle: FontStyle.italic
-                                                                ),
+                                                                    fontSize:
+                                                                        29,
+                                                                    fontFamily:
+                                                                        'Sans',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w800,
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic),
                                                               ),
                                                             ),
                                                             Text(
                                                               '$minutePart', // Tampilkan menit
-                                                              style: TextStyle(fontSize: 32, fontFamily: 'Sans', fontWeight: FontWeight.w800, fontStyle: FontStyle.italic),
+                                                              style: TextStyle(
+                                                                  fontSize: 32,
+                                                                  fontFamily:
+                                                                      'Sans',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w800,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .italic),
                                                             ),
-                                                            SizedBox(width: 5), // Beri sedikit jarak antara jam dan AM/PM
+                                                            SizedBox(
+                                                                width:
+                                                                    5), // Beri sedikit jarak antara jam dan AM/PM
                                                           ],
                                                         ),
                                                       );
                                                     } else {
                                                       return Text(
                                                         'Loading...',
-                                                        style: TextStyle(fontSize: 16),
+                                                        style: TextStyle(
+                                                            fontSize: 16),
                                                       );
                                                     }
                                                   },
@@ -322,14 +388,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
-                          itemCount: 2,
+                          itemCount: latestPresences.length,
                           itemBuilder: (context, index) {
-                            String loc = "(-7.3320625, 110.5009375)";
-                            String time = "0${index + 7}:39 AM";
+                            final presence =
+                                latestPresences.reversed.toList()[index];
+                            final waktu = presence[
+                                'waktu']; // Ambil nilai waktu dari data presensi
+                            final dateTime = DateTime.parse(
+                                waktu); // Ubah string waktu menjadi objek DateTime
+                            final formattedDate = DateFormat('dd MMMM yyyy').format(
+                                dateTime); // Format tanggal menjadi "27 Februari 2024"
+
+                            // Ambil bagian waktu dari jam
+                            final time = DateFormat.jm().format(
+                                dateTime); // Format waktu menjadi "1:30 PM" atau "13:30" (tergantung pada konfigurasi lokal)
 
                             return BlogTile(
                               time: time,
-                              loc: loc,
+                              date: formattedDate,
                             );
                           },
                         ),
@@ -354,12 +430,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
 class BlogTile extends StatelessWidget {
   final String time;
-  final String loc;
+  final String date;
 
   const BlogTile({
     Key? key,
     required this.time,
-    required this.loc,
+    required this.date,
   }) : super(key: key);
 
   @override
@@ -406,7 +482,7 @@ class BlogTile extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.topRight,
                   child: Text(
-                    "19 Januari 2024",
+                    date,
                     maxLines: 1,
                     style: const TextStyle(
                       color: Color(0xFFFEFEFE),

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PresenceService {
-  static const String baseUrl = "http://10.10.111.85:8000/api";
+  static const String baseUrl = "http://192.168.1.6:8000/api";
 
   // Token bearer
   final String token;
@@ -52,6 +52,23 @@ class PresenceService {
       }
     } catch (e) {
       print('Error posting data: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchKantorData() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/kantor'),
+      headers: {
+        'Authorization': 'Bearer $token'
+      }, // Include bearer token in the header
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse =
+          json.decode(response.body); // Parse the response as a map
+      return jsonResponse;
+    } else {
+      throw Exception('Failed to load kantor data');
     }
   }
 
