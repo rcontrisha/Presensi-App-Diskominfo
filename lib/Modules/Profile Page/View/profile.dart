@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:maps/Widgets/custom_dialogs.dart';
 import 'package:apsi/Modules/Profile%20Detail/View/detail_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Widgets/custom_bottom_navigation_bar.dart';
@@ -64,39 +65,31 @@ class _ProfilePageState extends State<ProfilePage> {
                             fontWeight: FontWeight.w400,
                           ),
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 45),
-                    Expanded(
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return SingleChildScrollView(
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                minHeight: constraints.maxHeight - 100,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  buildField(
-                                      "Informasi Profil",
-                                      "assets/images/profile.png",
-                                      Color(0xFF04A3EA), () {
-                                    // Navigasi ke halaman ProfileDetail
-                                    Get.to(() => ProfileDetail());
-                                  }),
-                                  buildField(
-                                      "Keluar",
-                                      "assets/images/logout.png",
-                                      Color(0xFF04A3EA), () {
-                                    // Navigasi ke halaman Landing
-                                  }),
-                                ],
-                              ),
+                        SizedBox(height: 45),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _profileController.buildField("Informasi Profil", "assets/images/profile.png", Color(0xFF04A3EA), () {
+                                  // Navigasi ke halaman ProfileDetail
+                                  Get.to(() => ProfileDetail());
+                                }),
+                                _profileController.buildField("Keluar", "assets/images/logout.png", Color(0xFF04A3EA), () {
+                                  // Navigasi ke halaman Landing
+                                  CustomDialogs.showLogoutConfirmation(context).then((confirmed) {
+                                    if (confirmed) {
+                                      // Tambahkan logika untuk presensi di sini
+                                      Get.to(() => ProfilePage());
+                                    } else {
+                                      // Pengguna menekan "Tidak", tidak perlu dilakukan apa pun
+                                    }
+                                  });
+
+                                }),
+                              ],
                             ),
-                          );
-                        },
-                      ),
+                          )
+                      ],
                     ),
                   ],
                 ),
