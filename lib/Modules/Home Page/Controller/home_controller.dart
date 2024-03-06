@@ -27,7 +27,7 @@ class HomeController extends GetxController {
   late String _androidId = '';
   late bool loggedToday = false;
   final RxList<Map<String, dynamic>> _officeData = <Map<String, dynamic>>[].obs;
-  String userImageUrl = ''; 
+  String userImageUrl = '';
 
   bool _deviceInfoLoaded = false;
 
@@ -70,6 +70,11 @@ class HomeController extends GetxController {
     } catch (e) {
       print('Error fetching office data: $e');
     }
+  }
+
+  void addPresenceData(Map<String, dynamic> newData) {
+    presenceData.add(newData);
+    update();
   }
 
   Future<void> fetchData() async {
@@ -215,6 +220,7 @@ class HomeController extends GetxController {
         // Customize the API call according to your needs
         await PresenceService(accessToken!).postData(presensiData);
         print('Presensi posted successfully');
+        fetchData();
       } catch (e) {
         print('Error posting presensi: $e');
       }

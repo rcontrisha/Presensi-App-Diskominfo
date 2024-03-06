@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:apsi/Modules/Presence%20List/View/plist_view.dart';
+import 'package:apsi/Routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -238,9 +239,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             final formattedTime =
                                 DateFormat('HH:mm').format(dateTime);
 
-                            return ListTile(
-                              time: formattedTime,
-                              date: formattedDate,
+                            return GestureDetector(
+                              onTap: () {
+                                Get.toNamed(
+                                    '${AppRoutes.presenceDetail}?id=${presence['id']}');
+                              },
+                              child: ListTile(
+                                time: formattedTime,
+                                date: formattedDate,
+                              ),
                             );
                           },
                         ),
