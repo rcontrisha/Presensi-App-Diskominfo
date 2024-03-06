@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:maps/Services/UsersAPI.dart';
+import 'package:apsi/Services/UsersAPI.dart';
 import 'package:device_info/device_info.dart';
 
 class UserController extends GetxController {

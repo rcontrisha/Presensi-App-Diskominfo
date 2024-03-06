@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PresenceService {
-  static const String baseUrl = "http://192.168.1.6:8000/api";
+  static const String baseUrl = "http://10.10.111.11:8000/api";
 
   // Token bearer
   final String token;
@@ -25,6 +25,23 @@ class PresenceService {
       return data;
     } else {
       throw Exception('Failed to load data');
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchPresenceById(int id) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/presences/$id'),
+      headers: {
+        'Authorization': 'Bearer $token'
+      }, // Include bearer token in the header
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonResponse =
+          json.decode(response.body); // Parse the response as a map
+      return jsonResponse;
+    } else {
+      throw Exception('Failed to load presence data');
     }
   }
 
