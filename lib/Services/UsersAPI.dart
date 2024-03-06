@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class UserService {
-  static const String apiUrl = 'http://192.168.1.6:8000/api';
+  static const String apiUrl = 'http://10.10.111.11:8000/api';
 
   static Future<Map<String, dynamic>> getUsersToken(
       String nip, String deviceId) async {

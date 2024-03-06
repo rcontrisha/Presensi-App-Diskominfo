@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:apsi/Modules/Presence%20List/View/plist_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -38,7 +39,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double containerHeight = MediaQuery.of(context).size.height;
-    late Stream<String> _timeStream = TimeUtils.getWIBTimeStream(); // Moved declaration here
+    late Stream<String> _timeStream =
+        TimeUtils.getWIBTimeStream(); // Moved declaration here
 
     return Scaffold(
       appBar: AppBar(
@@ -46,206 +48,204 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         toolbarHeight: 0,
       ),
       body: Obx(() {
-        if (_controller.isLoading) {
+        if (_controller.userData.isEmpty) {
           return Center(child: CircularProgressIndicator());
         } else {
           final List<Map<String, dynamic>> latestPresences =
-              _controller.presenceData.length > 2
+              _controller.presenceData.length > 3
                   ? _controller.presenceData
-                      .sublist(_controller.presenceData.length - 2)
+                      .sublist(_controller.presenceData.length - 3)
                   : _controller.presenceData;
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(left: 27.0, right: 27.0, top: 8),
               child: Column(
                 children: [
-                  if (_controller.currentPosition != null)
-                    Column(
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 40,
-                              backgroundImage: NetworkImage(_controller
-                                  .userImageUrl), // Menampilkan gambar dari URL
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundImage: NetworkImage(_controller
+                                .userImageUrl), // Menampilkan gambar dari URL
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 18.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Selamat Datang,",
+                                  style: TextStyle(
+                                    color: Color(0xFFB3B1B0),
+                                    fontFamily: 'Kanit',
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  "${_controller.userData[0]['nama']}",
+                                  style: TextStyle(
+                                    color: Color(0xFF000000),
+                                    fontFamily: 'Kanit',
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  "${_controller.userData[0]['nip']}",
+                                  style: TextStyle(
+                                    color: Color(0xFF000000),
+                                    fontFamily: 'Kanit',
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )
+                              ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 18.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 9),
+                      Container(
+                        width: screenWidth - 27.0 * 2,
+                        child: Stack(
+                          children: [
+                            // Kontainer Biru dan Gambar
+                            Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Color(0xFF04A3EA),
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              child: Stack(
                                 children: [
-                                  Text(
-                                    "Selamat Datang,",
-                                    style: TextStyle(
-                                      color: Color(0xFFB3B1B0),
-                                      fontFamily: 'Kanit',
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
+                                  // Gambar
+                                  Positioned.fill(
+                                    child: Image.asset(
+                                      'assets/images/home.png',
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "${_controller.userData[0]['nama']}",
-                                    style: TextStyle(
-                                      color: Color(0xFF000000),
-                                      fontFamily: 'Kanit',
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
+                                  // Kontainer Biru
+                                  Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Bagian kiri (Presensi)
+                                        Expanded(child: _buildPresensiCard()),
+                                        SizedBox(width: 5),
+                                        // Bagian kanan (Jam dan Tanggal)
+                                        Expanded(
+                                            child: _buildJamCard(_timeStream)),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    "10000001",
-                                    style: TextStyle(
-                                      color: Color(0xFF000000),
-                                      fontFamily: 'Kanit',
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  )
                                 ],
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 9),
-                        Container(
-                          width: screenWidth - 27.0 * 2,
-                          height: containerHeight - 135 - 545,
-                          child: Stack(
-                            children: [
-                              // Kontainer Biru dan Gambar
-                              Container(
-                                width: double.infinity,
-                                height: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF04A3EA),
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
-                                child: Stack(
-                                  children: [
-                                    // Gambar
-                                    Positioned.fill(
-                                      child: Image.asset(
-                                        'assets/images/home.png',
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    // Kontainer Biru
-                                    Padding(
-                                      padding: const EdgeInsets.all(8),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start, // Mengatur konten untuk tidak tertumpuk
-                                        children: [
-                                          // Bagian kiri (Presensi)
-                                          _buildPresensiCard(),
-                                          SizedBox(width: 5), // Beri sedikit jarak antara dua card
-                                          // Bagian kanan (Jam dan Tanggal)
-                                          _buildJamCard(_timeStream),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                      ),
+                      SizedBox(height: 9),
+                      Container(
+                        width: screenWidth - 27.0 * 2,
+                        height: containerHeight - 135 - 545,
+                        child: Card(
+                          color: Color(0xFFB3B1B0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
                           ),
-                        ),
-                        SizedBox(height: 9),
-                        Container(
-                          width: screenWidth - 27.0 * 2,
-                          height: containerHeight - 135 - 545,
-                          child: Card(
-                            color: Color(0xFFB3B1B0),
-                            shape: RoundedRectangleBorder(
+                          elevation: 4,
+                          child: Positioned.fill(
+                            child: ClipRRect(
                               borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            elevation: 4,
-                            child: Positioned.fill(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15.0),
-                                child: Image.asset(
-                                  'assets/images/map.png',
-                                  fit: BoxFit.cover,
-                                ),
+                              child: Image.asset(
+                                'assets/images/map.png',
+                                fit: BoxFit.cover,
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Container(
-                            child: Text(
-                              "Letjend., Jl. Sukowati No.51, Kalicacing, Sidomukti, Salatiga City, Central Java",
+                      ),
+                      SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Container(
+                          child: Text(
+                            "Letjend., Jl. Sukowati No.51, Kalicacing, Sidomukti, Salatiga City, Central Java",
+                            style: TextStyle(
+                              color: Color(0xFFB3B1B0),
+                              fontFamily: 'Kanit',
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Riwayat Presensi",
                               style: TextStyle(
-                                color: Color(0xFFB3B1B0),
+                                color: Color(0xFF272528),
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15.0,
                                 fontFamily: 'Kanit',
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w400,
                               ),
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Riwayat Presensi",
+                            TextButton(
+                              onPressed: () => Get.to(() => PListView()),
+                              child: Text(
+                                "show all",
                                 style: TextStyle(
-                                  color: Color(0xFF272528),
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15.0,
                                   fontFamily: 'Kanit',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 15,
                                 ),
                               ),
-                              TextButton(
-                                onPressed: () => Get.to(() => HomePage()),
-                                child: Text(
-                                  "show all",
-                                  style: TextStyle(
-                                    fontFamily: 'Kanit',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                style: TextButton.styleFrom(
-                                  primary: Color(0xFF04A3EA),
-                                ),
+                              style: TextButton.styleFrom(
+                                primary: Color(0xFF04A3EA),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 5),
+                      ),
+                      SizedBox(height: 5),
+                      if (latestPresences == null || latestPresences.isEmpty)
+                        CircularProgressIndicator()
+                      else
                         ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           itemCount: latestPresences.length,
                           itemBuilder: (context, index) {
-                            String time = "0${index + 7}:39 AM";
                             final presence =
                                 latestPresences.reversed.toList()[index];
-                            final waktu = presence[
-                                'waktu']; // Ambil nilai waktu dari data presensi
-                            final dateTime = DateTime.parse(
-                                waktu); // Ubah string waktu menjadi objek DateTime
-                            final formattedDate = DateFormat('dd MMMM yyyy').format(
-                                dateTime); // Format tanggal menjadi "27 Februari 2024"
+                            final waktu = presence['waktu'];
+                            final dateTime = DateTime.parse(waktu);
 
-                            // Ambil bagian waktu dari jam
-                            // final time = DateFormat.jm().format(
-                            //     dateTime); // Format waktu menjadi "1:30 PM" atau "13:30" (tergantung pada konfigurasi lokal)
+                            final formattedDate =
+                                DateFormat('dd MMMM yyyy').format(dateTime);
+                            final formattedTime =
+                                DateFormat('HH:mm').format(dateTime);
 
                             return ListTile(
-                              time: time,
+                              time: formattedTime,
                               date: formattedDate,
                             );
                           },
                         ),
-                      ],
-                    ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -270,24 +270,25 @@ Widget _buildPresensiCard() {
       borderRadius: BorderRadius.circular(12.0),
     ),
     child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 30.0),
+      padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            "Presensi\nTerakhir",
+            "Presensi Terakhir",
             style: TextStyle(
               fontSize: 15,
               fontFamily: 'Kanit',
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w400,
             ),
           ),
           SizedBox(height: 7), // Beri sedikit jarak antara teks
           Text(
-            "07:39 AM", // Anda dapat mempertahankan waktu ini atau menyesuaikannya dengan logika aplikasi Anda
+            "07:39", // Anda dapat mempertahankan waktu ini atau menyesuaikannya dengan logika aplikasi Anda
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 32,
               fontFamily: 'Sans',
               fontWeight: FontWeight.w800,
             ),
@@ -305,7 +306,7 @@ Widget _buildJamCard(Stream<String> timeStream) {
       borderRadius: BorderRadius.circular(12.0),
     ),
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30.0), // Mengurangi padding vertikal
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
       child: StreamBuilder<String>(
         stream: timeStream,
         builder: (context, snapshot) {
@@ -320,26 +321,52 @@ Widget _buildJamCard(Stream<String> timeStream) {
             final tahun = DateTime.now().year;
 
             final hariStr = [
-              'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'
+              'Senin',
+              'Selasa',
+              'Rabu',
+              'Kamis',
+              'Jumat',
+              'Sabtu',
+              'Minggu'
             ][hari - 1]; // -1 karena weekday dimulai dari 1
 
             final bulanStr = [
-              'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+              'Jan',
+              'Feb',
+              'Mar',
+              'Apr',
+              'Mei',
+              'Jun',
+              'Jul',
+              'Agu',
+              'Sep',
+              'Okt',
+              'Nov',
+              'Des'
             ][bulan - 1]; // -1 karena month dimulai dari 1
 
             return Column(
               mainAxisSize: MainAxisSize.min, // Set mainAxisSize menjadi min
-              mainAxisAlignment: MainAxisAlignment.start, // Set mainAxisAlignment menjadi start
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment
+                  .start, // Set mainAxisAlignment menjadi start
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   '$hariStr, $tanggal $bulanStr $tahun', // Tampilkan tanggal dan jam
-                  style: TextStyle(fontSize: 14, fontFamily: 'Sans', fontWeight: FontWeight.w500,),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontFamily: 'Sans',
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
                 SizedBox(height: 10), // Tambahkan jarak antara tanggal dan jam
                 Text(
                   '$hourPart:${minutePart}', // Tampilkan jam dan menit
-                  style: TextStyle(fontSize: 32, fontFamily: 'Sans', fontWeight: FontWeight.w800,),
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontFamily: 'Sans',
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ],
             );

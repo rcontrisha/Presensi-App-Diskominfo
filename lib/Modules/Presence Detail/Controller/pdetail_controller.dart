@@ -1,9 +1,9 @@
-// presence_controller.dart
-import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:apsi/Services/PresenceAPI.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+final SharedPreferences _sharedPreferences = Get.find<SharedPreferences>();
 
 class AddressDetails {
   final String street;
@@ -21,33 +21,34 @@ class AddressDetails {
   });
 }
 
-class PresenceController extends GetxController {
-  RxList<Map<String, dynamic>> presenceData = <Map<String, dynamic>>[].obs;
-  RxBool isLoading = true.obs;
-
-  final _sharedPreferences = Get.find<SharedPreferences>();
+class PresenceDetailController extends GetxController {
+  final RxMap<dynamic, dynamic> presence = {}.obs;
+  final RxBool isLoading = true.obs;
 
   @override
   void onInit() {
-    fetchData();
     super.onInit();
+    fetchPresenceById();
   }
 
-  Future<void> fetchData() async {
-    final storedNIP = _sharedPreferences.getString('nip');
+  void fetchPresenceById() async {
     final accessToken = _sharedPreferences.getString('token');
     try {
-      print("Fetching data...");
-      isLoading(true);
-      List<Map<String, dynamic>> data =
-          await PresenceService(accessToken!).fetchData();
-      presenceData.assignAll(data);
+      isLoading.value = true;
+      final id = Get.parameters['id'] ?? ''; // Gunakan id kosong jika null
+      if (id.isEmpty) {
+        print('Error: No id found in route parameters');
+        return; // Kembalikan jika id kosong atau null
+      }
+      print('Fetching presence data for id: $id');
+      final data =
+          await PresenceService(accessToken!).fetchPresenceById(int.parse(id));
+      print('Presence data for id $id: $data');
+      presence.value = data;
     } catch (e) {
-      print('Error: $e');
-      // Handle error as needed
+      print('Error fetching presence data: $e');
     } finally {
-      isLoading(false);
-      print("Data fetching completed.");
+      isLoading.value = false;
     }
   }
 

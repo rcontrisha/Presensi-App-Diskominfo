@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:maps/Modules/Profile%20Page/View/Profile.dart';
+import 'package:apsi/Modules/Profile%20Detail/Controller/detail_controller.dart';
+import 'package:apsi/Modules/Profile%20Page/View/Profile.dart';
 
 class ProfileDetail extends StatefulWidget {
   const ProfileDetail({Key? key}) : super(key: key);
@@ -10,6 +11,8 @@ class ProfileDetail extends StatefulWidget {
 }
 
 class _ProfileDetailState extends State<ProfileDetail> {
+  final DetailController detailController = Get.put(DetailController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,16 +20,17 @@ class _ProfileDetailState extends State<ProfileDetail> {
         title: Text(
           "Informasi Profil",
           style: TextStyle(
-            fontFamily: 'Kanit',
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-          ),
+              fontFamily: 'Kanit',
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              color: Colors.black),
         ),
         backgroundColor: Color(0xFFFEFEFE),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new),
+          color: Colors.black,
           onPressed: () {
             Get.offAll(() => ProfilePage());
           },
@@ -41,23 +45,40 @@ class _ProfileDetailState extends State<ProfileDetail> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: CircleAvatar(
-                radius: 70,
-              ),
-            ),
-            SizedBox(height: 15),
-            _buildList("NIP", "10000001"),
-            _buildList("Nama Lengkap", "Dilo Syuja Sherlieno"),
-            _buildList("Jabatan", "Pengawas II"),
-            _buildList("Email", "dilosyuja@gmail.com"),
-            _buildList("Nama Perangkat", "Xiaomi Redmi 9 Pro MaxWin"),
-            _buildList("ID Perangkat", "531728506629275a"),
-          ],
-        ),
+        child: Obx(() {
+          if (detailController.isLoadingImage.value) {
+            // Tampilkan indikator loading jika gambar sedang diunduh
+            return Center(child: CircularProgressIndicator());
+          } else if (detailController.userData.isNotEmpty) {
+            // Tampilkan data pengguna jika sudah tersedia
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: CircleAvatar(
+                    radius: 70,
+                    // Set image URL from controller
+                    backgroundImage:
+                        NetworkImage(detailController.userImageUrl),
+                  ),
+                ),
+                SizedBox(height: 15),
+                _buildList("NIP", "${detailController.userData[0]['nip']}"),
+                _buildList(
+                    "Nama Lengkap", "${detailController.userData[0]['nama']}"),
+                _buildList(
+                    "Jabatan", "${detailController.userData[0]['jabatan']}"),
+                _buildList("Email", "${detailController.userData[0]['email']}"),
+                _buildList("Nama Perangkat", "${detailController.deviceName}"),
+                _buildList("ID Perangkat",
+                    "${detailController.userData[0]['device_id']}"),
+              ],
+            );
+          } else {
+            // Tampilkan sesuatu jika data belum tersedia
+            return Center(child: CircularProgressIndicator());
+          }
+        }),
       ),
     );
   }
@@ -80,7 +101,8 @@ class _ProfileDetailState extends State<ProfileDetail> {
         ),
       ),
       child: SizedBox(
-        width: screenWidth - (2 * screenWidth * 0.12), // Lebar konten list responsif
+        width: screenWidth -
+            (2 * screenWidth * 0.12), // Lebar konten list responsif
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -100,7 +122,8 @@ class _ProfileDetailState extends State<ProfileDetail> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: screenWidth * 0.025), // Geser value ke kanan
+              padding: EdgeInsets.only(
+                  left: screenWidth * 0.025), // Geser value ke kanan
               child: Text(
                 value,
                 textAlign: TextAlign.left,

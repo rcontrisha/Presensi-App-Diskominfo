@@ -1,4 +1,4 @@
-package com.example.maps
+package com.example.apsi
 
 import io.flutter.embedding.android.FlutterActivity
 

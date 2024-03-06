@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:maps/Modules/Profile%20Page/View/profile.dart';
+import 'package:apsi/Modules/Profile%20Page/View/profile.dart';
+import '../Modules/Home Page/Controller/home_controller.dart';
 import '../Modules/Home Page/View/home_view.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -34,7 +35,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
                       Get.to(() => HomePage());
                     },
                     child: Ink(
-                      padding: EdgeInsets.only(top: 5, bottom: 5, left: 30, right: 50), // Menambahkan padding
+                      padding: EdgeInsets.only(
+                          top: 5,
+                          bottom: 5,
+                          left: 30,
+                          right: 50), // Menambahkan padding
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -44,20 +49,28 @@ class CustomBottomNavigationBar extends StatelessWidget {
                           ),
                           Text(
                             'Home',
-                            style: TextStyle(fontSize: 13, fontFamily: 'Kanit', fontWeight: FontWeight.w400),
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontFamily: 'Kanit',
+                                fontWeight: FontWeight.w400),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(width: 5), // Penambahan widget kosong untuk posisi tengah
+                  SizedBox(
+                      width: 5), // Penambahan widget kosong untuk posisi tengah
                   InkWell(
                     onTap: () {
                       // Tambahkan logika navigasi ke halaman Profile
                       Get.to(() => ProfilePage());
                     },
                     child: Ink(
-                      padding: EdgeInsets.only(top: 5, bottom: 5, left: 50, right: 30), // Menambahkan padding
+                      padding: EdgeInsets.only(
+                          top: 5,
+                          bottom: 5,
+                          left: 50,
+                          right: 30), // Menambahkan padding
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -67,7 +80,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
                           ),
                           Text(
                             'Profil',
-                            style: TextStyle(fontSize: 13, fontFamily: 'Kanit', fontWeight: FontWeight.w400),
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontFamily: 'Kanit',
+                                fontWeight: FontWeight.w400),
                           ),
                         ],
                       ),
@@ -93,13 +109,15 @@ class CustomBottomNavigationBar extends StatelessWidget {
                         padding: EdgeInsets.all(6),
                         elevation: 3),
                     onPressed: () {
-                      // Tambahkan logika untuk tombol presensi
-                      //Get.to(() => PresencePage());
+                      // Panggil metode handlePresensi saat tombol ditekan
+                      Get.find<HomeController>().handlePresensi();
                     },
                     child: Icon(Icons.fingerprint_outlined,
                         size: 50, color: Color(0xFFFEFEFE)),
                   ),
-                  SizedBox(height: 3,),
+                  SizedBox(
+                    height: 3,
+                  ),
                   Text(
                     "Presensi",
                     style: TextStyle(
