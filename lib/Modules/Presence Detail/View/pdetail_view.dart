@@ -27,7 +27,7 @@ class PresenceDetailView extends StatelessWidget {
           icon: Icon(Icons.arrow_back_ios_new),
           color: Colors.black,
           onPressed: () {
-            Get.offAll(() => PListView());
+            Get.back();
           },
         ),
         bottom: PreferredSize(
