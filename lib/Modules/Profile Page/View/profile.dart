@@ -28,13 +28,13 @@ class _ProfilePageState extends State<ProfilePage> {
         toolbarHeight: 0,
       ),
       body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 30.0),
-          child: Obx(() {
-            if (profileController.isLoadingImage.value) {
-              // Tampilkan indikator loading jika gambar sedang diunduh
-              return Center(child: CircularProgressIndicator());
-            } else if (profileController.userData.isNotEmpty) {
-              return Center(
+        padding: const EdgeInsets.symmetric(vertical: 30.0),
+        child: Obx(() {
+          if (profileController.isLoadingImage.value) {
+            return Center(child: CircularProgressIndicator());
+          } else if (profileController.userData.isNotEmpty) {
+            return SingleChildScrollView(
+              child: Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -66,39 +66,39 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         SizedBox(height: 45),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                buildField("Informasi Profil", "assets/images/profile.png", Color(0xFF04A3EA), () {
-                                  // Navigasi ke halaman ProfileDetail
-                                  Get.to(() => ProfileDetail());
-                                }),
-                                buildField("Keluar", "assets/images/logout.png", Color(0xFF04A3EA), () {
-                                  // Navigasi ke halaman Landing
-                                  CustomDialogs.showLogoutConfirmation(context).then((confirmed) {
-                                    if (confirmed) {
-                                      // Tambahkan logika untuk presensi di sini
-                                      Get.to(() => ProfilePage());
-                                    } else {
-                                      // Pengguna menekan "Tidak", tidak perlu dilakukan apa pun
-                                    }
-                                  });
-
-                                }),
-                              ],
-                            ),
-                          )
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            buildField(
+                                "Informasi Profil",
+                                "assets/images/profile.png",
+                                Color(0xFF04A3EA), () {
+                              Get.to(() => ProfileDetail());
+                            }),
+                            buildField("Keluar", "assets/images/logout.png",
+                                Color(0xFF04A3EA), () {
+                              CustomDialogs.showLogoutConfirmation(context)
+                                  .then((confirmed) {
+                                if (confirmed) {
+                                  Get.to(() => ProfilePage());
+                                } else {
+                                  // Do nothing
+                                }
+                              });
+                            }),
+                          ],
+                        )
                       ],
                     ),
                   ],
                 ),
-              );
-            } else {
-              // Tampilkan sesuatu jika data belum tersedia
-              return Center(child: CircularProgressIndicator());
-            }
-          })),
+              ),
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        }),
+      ),
       bottomNavigationBar: CustomBottomNavigationBar(),
     );
   }
@@ -116,20 +116,17 @@ class _ProfilePageState extends State<ProfilePage> {
         border: title == "Informasi Profil"
             ? Border(
                 top: BorderSide(
-                  color: Colors.grey
-                      .withOpacity(1), // Warna dan ketebalan garis tepi atas
+                  color: Colors.grey.withOpacity(1),
                   width: 1.0,
                 ),
                 bottom: BorderSide(
-                  color: Colors.grey
-                      .withOpacity(1), // Warna dan ketebalan garis tepi bawah
+                  color: Colors.grey.withOpacity(1),
                   width: 1.0,
                 ),
               )
             : Border(
                 bottom: BorderSide(
-                  color: Colors.grey
-                      .withOpacity(1), // Warna dan ketebalan garis tepi bawah
+                  color: Colors.grey.withOpacity(1),
                   width: 1.0,
                 ),
               ),
