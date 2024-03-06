@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:maps/Widgets/custom_dialogs.dart';
+import 'package:apsi/Widgets/custom_dialogs.dart';
 import 'package:apsi/Modules/Profile%20Detail/View/detail_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Widgets/custom_bottom_navigation_bar.dart';
@@ -70,11 +70,11 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                _profileController.buildField("Informasi Profil", "assets/images/profile.png", Color(0xFF04A3EA), () {
+                                buildField("Informasi Profil", "assets/images/profile.png", Color(0xFF04A3EA), () {
                                   // Navigasi ke halaman ProfileDetail
                                   Get.to(() => ProfileDetail());
                                 }),
-                                _profileController.buildField("Keluar", "assets/images/logout.png", Color(0xFF04A3EA), () {
+                                buildField("Keluar", "assets/images/logout.png", Color(0xFF04A3EA), () {
                                   // Navigasi ke halaman Landing
                                   CustomDialogs.showLogoutConfirmation(context).then((confirmed) {
                                     if (confirmed) {

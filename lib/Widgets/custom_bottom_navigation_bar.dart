@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:maps/Modules/Profile%20Page/View/profile.dart';
-import 'package:maps/Widgets/custom_dialogs.dart';
+import 'package:apsi/Modules/Profile%20Page/View/profile.dart';
+import 'package:apsi/Widgets/custom_dialogs.dart';
 import 'package:apsi/Modules/Profile%20Page/View/profile.dart';
 import '../Modules/Home Page/Controller/home_controller.dart';
 import '../Modules/Home Page/View/home_view.dart';
