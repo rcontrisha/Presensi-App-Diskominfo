@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:maps/Widgets/custom_dialogs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Widgets/custom_bottom_navigation_bar.dart';
 import '../../Landing Page/landingpage.dart';
@@ -77,6 +78,14 @@ class _ProfilePageState extends State<ProfilePage> {
                             }),
                             _profileController.buildField("Keluar", "assets/images/logout.png", Color(0xFF04A3EA), () {
                               // Navigasi ke halaman Landing
+                              CustomDialogs.showLogoutConfirmation(context).then((confirmed) {
+                                if (confirmed) {
+                                  // Tambahkan logika untuk presensi di sini
+                                  Get.to(() => ProfilePage());
+                                } else {
+                                  // Pengguna menekan "Tidak", tidak perlu dilakukan apa pun
+                                }
+                              });
 
                             }),
                           ],

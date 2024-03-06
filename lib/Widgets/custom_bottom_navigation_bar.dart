@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:maps/Modules/Profile%20Page/View/profile.dart';
+import 'package:maps/Widgets/custom_dialogs.dart';
 import '../Modules/Home Page/View/home_view.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -30,17 +31,16 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 children: [
                   InkWell(
                     onTap: () {
-                      // Tambahkan logika navigasi ke halaman Home
                       Get.to(() => HomePage());
                     },
                     child: Ink(
-                      padding: EdgeInsets.only(top: 5, bottom: 5, left: 30, right: 50), // Menambahkan padding
+                      padding: EdgeInsets.only(top: 5, bottom: 5, left: 30, right: 50),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.home,
-                            size: 32, // Atur ukuran ikon
+                            size: 32,
                           ),
                           Text(
                             'Home',
@@ -50,7 +50,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(width: 5), // Penambahan widget kosong untuk posisi tengah
+                  SizedBox(width: 5),
                   InkWell(
                     onTap: () {
                       // Tambahkan logika navigasi ke halaman Profile
@@ -89,23 +89,30 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        primary: Color(0xFF85817F),
-                        padding: EdgeInsets.all(6),
-                        elevation: 3),
+                      primary: Color(0xFF85817F),
+                      padding: EdgeInsets.all(6),
+                      elevation: 3,
+                    ),
                     onPressed: () {
-                      // Tambahkan logika untuk tombol presensi
-                      //Get.to(() => PresencePage());
+                      CustomDialogs.showAttendanceConfirmation(context).then((confirmed) {
+                        if (confirmed) {
+                          // Tambahkan logika untuk presensi di sini
+                          Get.to(() => ProfilePage());
+                        } else {
+                          // Pengguna menekan "Tidak", tidak perlu dilakukan apa pun
+                        }
+                      });
                     },
-                    child: Icon(Icons.fingerprint_outlined,
-                        size: 50, color: Color(0xFFFEFEFE)),
+                    child: Icon(Icons.fingerprint_outlined, size: 50, color: Color(0xFFFEFEFE)),
                   ),
                   SizedBox(height: 3,),
                   Text(
                     "Presensi",
                     style: TextStyle(
-                        fontFamily: 'Kanit',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 13),
+                      fontFamily: 'Kanit',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
