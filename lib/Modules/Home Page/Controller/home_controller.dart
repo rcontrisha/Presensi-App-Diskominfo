@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:maps/Modules/Login%20Page/View/login_view.dart';
-import 'package:maps/Services/PresenceAPI.dart';
-import 'package:maps/Services/UsersAPI.dart';
+import 'package:apsi/Modules/Login%20Page/View/login_view.dart';
+import 'package:apsi/Services/PresenceAPI.dart';
+import 'package:apsi/Services/UsersAPI.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maps_launcher/maps_launcher.dart';
@@ -13,13 +13,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:device_info/device_info.dart';
 
 final SharedPreferences _sharedPreferences = Get.find<SharedPreferences>();
-
-class CompanyData {
-  static Map<String, dynamic> office = {
-    'latitude': -7.332009384553485,
-    'longitude': 110.50127269821182
-  };
-}
 
 class HomeController extends GetxController {
   final Rx<Position?> _currentPosition = Rx<Position?>(null);
@@ -34,7 +27,7 @@ class HomeController extends GetxController {
   late String _androidId = '';
   late bool loggedToday = false;
   final RxList<Map<String, dynamic>> _officeData = <Map<String, dynamic>>[].obs;
-  String userImageUrl = ''; // URL gambar pengguna
+  String userImageUrl = ''; 
 
   bool _deviceInfoLoaded = false;
 
@@ -172,7 +165,6 @@ class HomeController extends GetxController {
   // Method untuk mengambil data user sesuai dengan NIP
   Future<void> fetchUserByNip(String nip) async {
     try {
-      // Panggil method getUsers dari UserService untuk mendapatkan data user berdasarkan NIP
       final userDataFromServer =
           await UserService.getUsersByNipAndDeviceId(nip);
 
@@ -275,20 +267,14 @@ class HomeController extends GetxController {
     }
   }
 
-  void launchOfficeOnMap() {
-    try {
-      MapsLauncher.launchCoordinates(
-        CompanyData.office['latitude'],
-        CompanyData.office['longitude'],
-      );
-    } catch (e) {
-      print('Error launching maps: $e');
-    }
-  }
-
-  void logout() {
-    _sharedPreferences.remove('hasLoggedIn');
-    _sharedPreferences.remove('nip');
-    Get.to(() => LoginScreen());
-  }
+  // void launchOfficeOnMap() {
+  //   try {
+  //     MapsLauncher.launchCoordinates(
+  //       CompanyData.office['latitude'],
+  //       CompanyData.office['longitude'],
+  //     );
+  //   } catch (e) {
+  //     print('Error launching maps: $e');
+  //   }
+  // }
 }

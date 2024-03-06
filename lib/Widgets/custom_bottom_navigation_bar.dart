@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:maps/Modules/Profile%20Page/View/profile.dart';
 import 'package:maps/Widgets/custom_dialogs.dart';
+import 'package:apsi/Modules/Profile%20Page/View/profile.dart';
+import '../Modules/Home Page/Controller/home_controller.dart';
 import '../Modules/Home Page/View/home_view.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -44,7 +46,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
                           ),
                           Text(
                             'Home',
-                            style: TextStyle(fontSize: 13, fontFamily: 'Kanit', fontWeight: FontWeight.w400),
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontFamily: 'Kanit',
+                                fontWeight: FontWeight.w400),
                           ),
                         ],
                       ),
@@ -57,7 +62,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
                       Get.to(() => ProfilePage());
                     },
                     child: Ink(
-                      padding: EdgeInsets.only(top: 5, bottom: 5, left: 50, right: 30), // Menambahkan padding
+                      padding: EdgeInsets.only(
+                          top: 5,
+                          bottom: 5,
+                          left: 50,
+                          right: 30), // Menambahkan padding
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -67,7 +76,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
                           ),
                           Text(
                             'Profil',
-                            style: TextStyle(fontSize: 13, fontFamily: 'Kanit', fontWeight: FontWeight.w400),
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontFamily: 'Kanit',
+                                fontWeight: FontWeight.w400),
                           ),
                         ],
                       ),
@@ -96,8 +108,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
                     onPressed: () {
                       CustomDialogs.showAttendanceConfirmation(context).then((confirmed) {
                         if (confirmed) {
-                          // Tambahkan logika untuk presensi di sini
-                          Get.to(() => ProfilePage());
+                          // Panggil metode handlePresensi saat tombol ditekan
+                          Get.find<HomeController>().handlePresensi();
                         } else {
                           // Pengguna menekan "Tidak", tidak perlu dilakukan apa pun
                         }
@@ -105,7 +117,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
                     },
                     child: Icon(Icons.fingerprint_outlined, size: 50, color: Color(0xFFFEFEFE)),
                   ),
-                  SizedBox(height: 3,),
+                  SizedBox(
+                    height: 3,
+                  ),
                   Text(
                     "Presensi",
                     style: TextStyle(
